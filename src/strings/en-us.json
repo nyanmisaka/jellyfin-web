@@ -1498,5 +1498,5 @@
     "EveryXMinutes": "Every {0} minutes",
     "EveryHour": "Every hour",
     "EveryXHours": "Every {0} hours",
-    "OnApplicationStartup": "On application startup",
+    "OnApplicationStartup": "On application startup"
 }
