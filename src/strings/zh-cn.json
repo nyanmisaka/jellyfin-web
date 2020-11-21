@@ -1450,5 +1450,7 @@
     "LabelAllowedAudioChannels": "允许的最大声道数量",
     "LabelSelectAudioChannels": "声道",
     "LabelSelectMono": "单声道",
-    "LabelSelectStereo": "立体声"
+    "LabelSelectStereo": "立体声",
+    "AspectRatioCover": "覆盖",
+    "AspectRatioFill": "填充"
 }

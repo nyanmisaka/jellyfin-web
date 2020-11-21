@@ -1447,5 +1447,7 @@
     "LabelAllowedAudioChannels": "Maximum Allowed Audio Channels",
     "LabelSelectAudioChannels": "Channels",
     "LabelSelectMono": "Mono",
-    "LabelSelectStereo": "Stereo"
+    "LabelSelectStereo": "Stereo",
+    "AspectRatioCover": "Cover",
+    "AspectRatioFill": "Fill"
 }
