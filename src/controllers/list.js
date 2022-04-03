@@ -11,7 +11,7 @@ import AlphaPicker from '../components/alphaPicker/alphaPicker';
 import '../elements/emby-itemscontainer/emby-itemscontainer';
 import '../elements/emby-scroller/emby-scroller';
 import ServerConnections from '../components/ServerConnections';
-import { appRouter } from '../components/appRouter';
+import LibraryMenu from '../scripts/libraryMenu';
 
 /* eslint-disable indent */
 
@@ -260,7 +260,7 @@ import { appRouter } from '../components/appRouter';
                 EnableImageTypes: 'Primary,Backdrop,Thumb',
                 EnableTotalRecordCount: false,
                 SortBy: sortBy,
-                Rewatching: params.rewatching
+                EnableRewatching: userSettings.enableRewatchingInNextUp()
             }));
         }
 
@@ -635,7 +635,7 @@ class ItemsView {
         }
 
         function setTitle(item) {
-            appRouter.setTitle(getTitle(item) || '');
+            LibraryMenu.setTitle(getTitle(item) || '');
 
             if (item && item.CollectionType === 'playlists') {
                 hideOrShowAll(view.querySelectorAll('.btnNewItem'), false);
@@ -678,9 +678,6 @@ class ItemsView {
             }
 
             if (params.type === 'nextup') {
-                if (params.rewatching === 'true') {
-                    return globalize.translate('NextUpRewatching');
-                }
                 return globalize.translate('NextUp');
             }
 

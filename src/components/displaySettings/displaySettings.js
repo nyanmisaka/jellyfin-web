@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import browser from '../../scripts/browser';
 import layoutManager from '../layoutManager';
 import { pluginManager } from '../pluginManager';
@@ -21,7 +22,7 @@ import template from './displaySettings.template.html';
     function fillThemes(select, selectedTheme) {
         skinManager.getThemes().then(themes => {
             select.innerHTML = themes.map(t => {
-                return `<option value="${t.id}">${t.name}</option>`;
+                return `<option value="${t.id}">${escapeHtml(t.name)}</option>`;
             }).join('');
 
             // get default theme
@@ -47,7 +48,7 @@ import template from './displaySettings.template.html';
         });
 
         selectScreensaver.innerHTML = options.map(o => {
-            return `<option value="${o.value}">${o.name}</option>`;
+            return `<option value="${o.value}">${escapeHtml(o.name)}</option>`;
         }).join('');
 
         selectScreensaver.value = userSettings.screensaver();
@@ -113,7 +114,6 @@ import template from './displaySettings.template.html';
         context.querySelector('#chkBlurhash').checked = userSettings.enableBlurhash();
         context.querySelector('#chkBackdrops').checked = userSettings.enableBackdrops();
         context.querySelector('#chkDetailsBanner').checked = userSettings.detailsBanner();
-        context.querySelector('#chkUseEpisodeImagesInNextUp').checked = userSettings.useEpisodeImagesInNextUpAndResume();
 
         context.querySelector('#chkDisableCustomCss').checked = userSettings.disableCustomCss();
         context.querySelector('#txtLocalCustomCss').value = userSettings.customCss();
@@ -122,7 +122,10 @@ import template from './displaySettings.template.html';
         context.querySelector('.selectDateTimeLocale').value = userSettings.dateTimeLocale() || '';
 
         context.querySelector('#txtLibraryPageSize').value = userSettings.libraryPageSize();
+
         context.querySelector('#txtMaxDaysForNextUp').value = userSettings.maxDaysForNextUp();
+        context.querySelector('#chkRewatchingNextUp').checked = userSettings.enableRewatchingInNextUp();
+        context.querySelector('#chkUseEpisodeImagesInNextUp').checked = userSettings.useEpisodeImagesInNextUpAndResume();
 
         context.querySelector('.selectLayout').value = layoutManager.getSavedLayout() || '';
 
@@ -147,13 +150,15 @@ import template from './displaySettings.template.html';
         userSettingsInstance.screensaver(context.querySelector('.selectScreensaver').value);
 
         userSettingsInstance.libraryPageSize(context.querySelector('#txtLibraryPageSize').value);
+
         userSettingsInstance.maxDaysForNextUp(context.querySelector('#txtMaxDaysForNextUp').value);
+        userSettingsInstance.enableRewatchingInNextUp(context.querySelector('#chkRewatchingNextUp').checked);
+        userSettingsInstance.useEpisodeImagesInNextUpAndResume(context.querySelector('#chkUseEpisodeImagesInNextUp').checked);
 
         userSettingsInstance.enableFastFadein(context.querySelector('#chkFadein').checked);
         userSettingsInstance.enableBlurhash(context.querySelector('#chkBlurhash').checked);
         userSettingsInstance.enableBackdrops(context.querySelector('#chkBackdrops').checked);
         userSettingsInstance.detailsBanner(context.querySelector('#chkDetailsBanner').checked);
-        userSettingsInstance.useEpisodeImagesInNextUpAndResume(context.querySelector('#chkUseEpisodeImagesInNextUp').checked);
 
         userSettingsInstance.disableCustomCss(context.querySelector('#chkDisableCustomCss').checked);
         userSettingsInstance.customCss(context.querySelector('#txtLocalCustomCss').value);

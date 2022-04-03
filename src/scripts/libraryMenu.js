@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import dom from './dom';
 import layoutManager from '../components/layoutManager';
 import inputManager from './inputManager';
@@ -28,7 +29,7 @@ import Headroom from 'headroom.js';
         html += '<button type="button" is="paper-icon-button-light" class="headerButton headerButtonLeft headerBackButton hide"><span class="material-icons ' + (browser.safari ? 'chevron_left' : 'arrow_back') + '" aria-hidden="true"></span></button>';
         html += '<button type="button" is="paper-icon-button-light" class="headerButton headerHomeButton hide barsMenuButton headerButtonLeft"><span class="material-icons home" aria-hidden="true"></span></button>';
         html += '<button type="button" is="paper-icon-button-light" class="headerButton mainDrawerButton barsMenuButton headerButtonLeft hide"><span class="material-icons menu" aria-hidden="true"></span></button>';
-        html += '<h3 class="pageTitle"></h3>';
+        html += '<h3 class="pageTitle" aria-hidden="true"></h3>';
         html += '</div>';
         html += '<div class="headerRight">';
         html += '<button is="paper-icon-button-light" class="headerSyncButton syncButton headerButton headerButtonRight hide"><span class="material-icons groups" aria-hidden="true"></span></button>';
@@ -80,6 +81,18 @@ import Headroom from 'headroom.js';
     }
 
     function retranslateUi() {
+        if (headerBackButton) {
+            headerBackButton.title = globalize.translate('ButtonBack');
+        }
+
+        if (headerHomeButton) {
+            headerHomeButton.title = globalize.translate('Home');
+        }
+
+        if (mainDrawerButton) {
+            mainDrawerButton.title = globalize.translate('Menu');
+        }
+
         if (headerSyncButton) {
             headerSyncButton.title = globalize.translate('ButtonSyncPlay');
         }
@@ -94,6 +107,10 @@ import Headroom from 'headroom.js';
 
         if (headerSearchButton) {
             headerSearchButton.title = globalize.translate('Search');
+        }
+
+        if (headerUserButton) {
+            headerUserButton.title = globalize.translate('Settings');
         }
     }
 
@@ -542,7 +559,7 @@ import Headroom from 'headroom.js';
         }
 
         menuHtml += '<span class="navMenuOptionText">';
-        menuHtml += item.name;
+        menuHtml += escapeHtml(item.name);
         menuHtml += '</span>';
         return menuHtml + '</a>';
     }
@@ -560,7 +577,7 @@ import Headroom from 'headroom.js';
                     menuHtml += getToolsLinkHtml(item);
                 } else if (item.name) {
                     menuHtml += '<h3 class="sidebarHeader">';
-                    menuHtml += item.name;
+                    menuHtml += escapeHtml(item.name);
                     menuHtml += '</h3>';
                 }
             }
@@ -684,7 +701,7 @@ import Headroom from 'headroom.js';
 
                     return `<a is="emby-linkbutton" data-itemid="${itemId}" class="lnkMediaFolder navMenuOption" href="${getItemHref(i, i.CollectionType)}">
                                     <span class="material-icons navMenuOptionIcon ${icon}" aria-hidden="true"></span>
-                                    <span class="sectionName navMenuOptionText">${i.Name}</span>
+                                    <span class="sectionName navMenuOptionText">${escapeHtml(i.Name)}</span>
                                   </a>`;
                 }).join('');
                 libraryMenuOptions.innerHTML = html;
@@ -735,7 +752,7 @@ import Headroom from 'headroom.js';
         if (info && !info.isLocalPlayer) {
             icon.classList.add('cast_connected');
             headerCastButton.classList.add('castButton-active');
-            context.querySelector('.headerSelectedPlayer').innerHTML = info.deviceName || info.name;
+            context.querySelector('.headerSelectedPlayer').innerText = info.deviceName || info.name;
         } else {
             icon.classList.add('cast');
             headerCastButton.classList.remove('castButton-active');
@@ -957,7 +974,7 @@ import Headroom from 'headroom.js';
             pageTitleElement.classList.remove('pageTitleWithLogo');
             pageTitleElement.classList.remove('pageTitleWithDefaultLogo');
             pageTitleElement.style.backgroundImage = null;
-            pageTitleElement.innerHTML = html || '';
+            pageTitleElement.innerText = html || '';
         }
 
         document.title = title || 'Jellyfin';

@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import dom from '../../scripts/dom';
 import dialogHelper from '../dialogHelper/dialogHelper';
 import loading from '../loading/loading';
@@ -126,7 +127,7 @@ import ServerConnections from '../ServerConnections';
             html += `<option value="">${globalize.translate('OptionNew')}</option>`;
 
             html += result.Items.map(i => {
-                return `<option value="${i.Id}">${i.Name}</option>`;
+                return `<option value="${i.Id}">${escapeHtml(i.Name)}</option>`;
             });
 
             select.innerHTML = html;
@@ -242,7 +243,7 @@ import ServerConnections from '../ServerConnections';
             const title = globalize.translate('HeaderAddToPlaylist');
 
             html += '<div class="formDialogHeader">';
-            html += '<button is="paper-icon-button-light" class="btnCancel autoSize" tabindex="-1"><span class="material-icons arrow_back" aria-hidden="true"></span></button>';
+            html += `<button is="paper-icon-button-light" class="btnCancel autoSize" tabindex="-1" title="${globalize.translate('ButtonBack')}"><span class="material-icons arrow_back" aria-hidden="true"></span></button>`;
             html += '<h3 class="formDialogHeaderTitle">';
             html += title;
             html += '</h3>';

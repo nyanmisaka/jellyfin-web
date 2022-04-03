@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import { playbackManager } from '../../../components/playback/playbackmanager';
 import SyncPlay from '../../../components/syncPlay/core';
 import browser from '../../../scripts/browser';
@@ -22,6 +23,7 @@ import ServerConnections from '../../../components/ServerConnections';
 import shell from '../../../scripts/shell';
 import SubtitleSync from '../../../components/subtitlesync/subtitlesync';
 import { appRouter } from '../../../components/appRouter';
+import LibraryMenu from '../../../scripts/libraryMenu';
 
 /* eslint-disable indent */
 
@@ -149,7 +151,7 @@ import { appRouter } from '../../../components/appRouter';
             currentItem = item;
             if (!item) {
                 updateRecordingButton(null);
-                appRouter.setTitle('');
+                LibraryMenu.setTitle('');
                 nowPlayingVolumeSlider.disabled = true;
                 nowPlayingPositionSlider.disabled = true;
                 btnFastForward.disabled = true;
@@ -205,7 +207,7 @@ import { appRouter } from '../../../components/appRouter';
                 itemName = parentName || '';
             }
 
-            appRouter.setTitle(itemName);
+            LibraryMenu.setTitle(itemName);
 
             const documentTitle = parentName || (item ? item.Name : null);
 
@@ -643,13 +645,19 @@ import { appRouter } from '../../../components/appRouter';
 
             btnPlayPauseIcon.classList.remove('play_arrow', 'pause');
 
+            let icon;
+            let title;
+
             if (isPaused) {
-                btnPlayPauseIcon.classList.add('play_arrow');
-                btnPlayPause.setAttribute('title', globalize.translate('Play') + ' (k)');
+                icon = 'play_arrow';
+                title = globalize.translate('Play');
             } else {
-                btnPlayPauseIcon.classList.add('pause');
-                btnPlayPause.setAttribute('title', globalize.translate('ButtonPause') + ' (k)');
+                icon = 'pause';
+                title = globalize.translate('ButtonPause');
             }
+
+            btnPlayPauseIcon.classList.add(icon);
+            dom.setElementTitle(btnPlayPause, title + ' (k)', title);
         }
 
         function updatePlayerStateInternal(event, player, state) {
@@ -1230,7 +1238,7 @@ import { appRouter } from '../../../components/appRouter';
                 html += '<img class="chapterThumb" src="' + src + '" />';
                 html += '<div class="chapterThumbTextContainer">';
                 html += '<div class="chapterThumbText chapterThumbText-dim">';
-                html += chapter.Name;
+                html += escapeHtml(chapter.Name);
                 html += '</div>';
                 html += '<h2 class="chapterThumbText">';
                 html += datetime.getDisplayRunningTime(positionTicks);

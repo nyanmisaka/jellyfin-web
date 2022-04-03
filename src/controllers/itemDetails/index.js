@@ -1,4 +1,6 @@
 import { intervalToDuration } from 'date-fns';
+import DOMPurify from 'dompurify';
+import escapeHtml from 'escape-html';
 import { appHost } from '../../components/apphost';
 import loading from '../../components/loading/loading';
 import { appRouter } from '../../components/appRouter';
@@ -211,7 +213,7 @@ function renderTrackSelections(page, instance, item, forceReload) {
     const selectedId = mediaSources[0].Id;
     select.innerHTML = mediaSources.map(function (v) {
         const selected = v.Id === selectedId ? ' selected' : '';
-        return '<option value="' + v.Id + '"' + selected + '>' + v.Name + '</option>';
+        return '<option value="' + v.Id + '"' + selected + '>' + escapeHtml(v.Name) + '</option>';
     }).join('');
 
     if (mediaSources.length > 1) {
@@ -415,7 +417,7 @@ function getArtistLinksHtml(artists, serverId, context) {
             itemType: 'MusicArtist',
             serverId: serverId
         });
-        html.push('<a style="color:inherit;" class="button-link" is="emby-linkbutton" href="' + href + '">' + artist.Name + '</a>');
+        html.push('<a style="color:inherit;" class="button-link" is="emby-linkbutton" href="' + href + '">' + escapeHtml(artist.Name) + '</a>');
     }
 
     return html.join(' / ');
@@ -438,21 +440,21 @@ function renderName(item, container, context) {
         parentNameHtml.push(getArtistLinksHtml(item.ArtistItems, item.ServerId, context));
         parentNameLast = true;
     } else if (item.SeriesName && item.Type === 'Episode') {
-        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.SeriesId}" data-serverid="${item.ServerId}" data-type="Series" data-isfolder="true">${item.SeriesName}</a>`);
+        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.SeriesId}" data-serverid="${item.ServerId}" data-type="Series" data-isfolder="true">${escapeHtml(item.SeriesName)}</a>`);
     } else if (item.IsSeries || item.EpisodeTitle) {
-        parentNameHtml.push(item.Name);
+        parentNameHtml.push(escapeHtml(item.Name));
     }
 
     if (item.SeriesName && item.Type === 'Season') {
-        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.SeriesId}" data-serverid="${item.ServerId}" data-type="Series" data-isfolder="true">${item.SeriesName}</a>`);
+        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.SeriesId}" data-serverid="${item.ServerId}" data-type="Series" data-isfolder="true">${escapeHtml(item.SeriesName)}</a>`);
     } else if (item.ParentIndexNumber != null && item.Type === 'Episode') {
-        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.SeasonId}" data-serverid="${item.ServerId}" data-type="Season" data-isfolder="true">${item.SeasonName}</a>`);
+        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.SeasonId}" data-serverid="${item.ServerId}" data-type="Season" data-isfolder="true">${escapeHtml(item.SeasonName)}</a>`);
     } else if (item.ParentIndexNumber != null && item.IsSeries) {
-        parentNameHtml.push(item.SeasonName || 'S' + item.ParentIndexNumber);
+        parentNameHtml.push(escapeHtml(item.SeasonName) || 'S' + item.ParentIndexNumber);
     } else if (item.Album && item.AlbumId && (item.Type === 'MusicVideo' || item.Type === 'Audio')) {
-        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.AlbumId}" data-serverid="${item.ServerId}" data-type="MusicAlbum" data-isfolder="true">${item.Album}</a>`);
+        parentNameHtml.push(`<a style="color:inherit;" class="button-link itemAction" is="emby-linkbutton" href="#" data-action="link" data-id="${item.AlbumId}" data-serverid="${item.ServerId}" data-type="MusicAlbum" data-isfolder="true">${escapeHtml(item.Album)}</a>`);
     } else if (item.Album) {
-        parentNameHtml.push(item.Album);
+        parentNameHtml.push(escapeHtml(item.Album));
     }
 
     // FIXME: This whole section needs some refactoring, so it becames easier to scale across all form factors. See GH #1022
@@ -473,9 +475,9 @@ function renderName(item, container, context) {
         }
     }
 
-    const name = itemHelper.getDisplayName(item, {
+    const name = escapeHtml(itemHelper.getDisplayName(item, {
         includeParentInfo: false
-    });
+    }));
 
     if (html && !parentNameLast) {
         if (tvSeasonHtml) {
@@ -490,7 +492,7 @@ function renderName(item, container, context) {
     }
 
     if (item.OriginalTitle && item.OriginalTitle != item.Name) {
-        html += '<h4 class="itemName infoText originalTitle">' + item.OriginalTitle + '</h4>';
+        html += '<h4 class="itemName infoText originalTitle">' + escapeHtml(item.OriginalTitle) + '</h4>';
     }
 
     container.innerHTML = html;
@@ -569,7 +571,7 @@ function renderDetailPageBackdrop(page, item, apiClient) {
 function reloadFromItem(instance, page, params, item, user) {
     const apiClient = ServerConnections.getApiClient(item.ServerId);
 
-    appRouter.setTitle('');
+    libraryMenu.setTitle('');
 
     // Start rendering the artwork first
     renderImage(page, item);
@@ -664,7 +666,9 @@ function reloadFromItem(instance, page, params, item, user) {
     if (item.Type == 'Person' && item.ProductionLocations && item.ProductionLocations.length) {
         let location = item.ProductionLocations[0];
         if (!layoutManager.tv && appHost.supports('externallinks')) {
-            location = `<a is="emby-linkbutton" class="button-link textlink" target="_blank" href="https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}">${location}</a>`;
+            location = `<a is="emby-linkbutton" class="button-link textlink" target="_blank" href="https://www.openstreetmap.org/search?query=${encodeURIComponent(location)}">${escapeHtml(location)}</a>`;
+        } else {
+            location = escapeHtml(location);
         }
         itemBirthLocation.classList.remove('hide');
         itemBirthLocation.innerHTML = globalize.translate('BirthPlaceValue', location);
@@ -743,7 +747,7 @@ function renderLinks(page, item) {
 
     if (item.ExternalUrls) {
         for (const url of item.ExternalUrls) {
-            links.push(`<a is="emby-linkbutton" class="button-link" href="${url.Url}" target="_blank">${url.Name}</a>`);
+            links.push(`<a is="emby-linkbutton" class="button-link" href="${url.Url}" target="_blank">${escapeHtml(url.Name)}</a>`);
         }
     }
 
@@ -770,6 +774,7 @@ function renderDetailImage(elem, item, imageLoader) {
         centerText: true,
         overlayText: false,
         transition: false,
+        disableHoverMenu: true,
         disableIndicators: true,
         overlayPlayButton: layoutManager.desktop,
         action: layoutManager.desktop ? 'resume' : 'none',
@@ -897,33 +902,39 @@ function toggleLineClamp(clampTarget, e) {
 }
 
 function renderOverview(page, item) {
-    for (const overviewElemnt of page.querySelectorAll('.overview')) {
-        const overview = item.Overview || '';
+    const overviewElements = page.querySelectorAll('.overview');
+
+    if (overviewElements.length > 0) {
+        const overview = DOMPurify.sanitize(item.Overview || '');
 
         if (overview) {
-            overviewElemnt.innerHTML = overview;
-            overviewElemnt.classList.remove('hide');
-            overviewElemnt.classList.add('detail-clamp-text');
+            for (const overviewElemnt of overviewElements) {
+                overviewElemnt.innerHTML = overview;
+                overviewElemnt.classList.remove('hide');
+                overviewElemnt.classList.add('detail-clamp-text');
 
-            // Grab the sibling element to control the expand state
-            const expandButton = overviewElemnt.parentElement.querySelector('.overview-expand');
+                // Grab the sibling element to control the expand state
+                const expandButton = overviewElemnt.parentElement.querySelector('.overview-expand');
 
-            // Detect if we have overflow of text. Based on this StackOverflow answer
-            // https://stackoverflow.com/a/35157976
-            if (Math.abs(overviewElemnt.scrollHeight - overviewElemnt.offsetHeight) > 2) {
-                expandButton.classList.remove('hide');
-            } else {
-                expandButton.classList.add('hide');
-            }
+                // Detect if we have overflow of text. Based on this StackOverflow answer
+                // https://stackoverflow.com/a/35157976
+                if (Math.abs(overviewElemnt.scrollHeight - overviewElemnt.offsetHeight) > 2) {
+                    expandButton.classList.remove('hide');
+                } else {
+                    expandButton.classList.add('hide');
+                }
 
-            expandButton.addEventListener('click', toggleLineClamp.bind(null, overviewElemnt));
+                expandButton.addEventListener('click', toggleLineClamp.bind(null, overviewElemnt));
 
-            for (const anchor of overviewElemnt.querySelectorAll('a')) {
-                anchor.setAttribute('target', '_blank');
+                for (const anchor of overviewElemnt.querySelectorAll('a')) {
+                    anchor.setAttribute('target', '_blank');
+                }
             }
         } else {
-            overviewElemnt.innerHTML = '';
-            overviewElemnt.classList.add('hide');
+            for (const overviewElemnt of overviewElements) {
+                overviewElemnt.innerHTML = '';
+                overviewElemnt.classList.add('hide');
+            }
         }
     }
 }
@@ -940,7 +951,7 @@ function renderGenres(page, item, context = inferContext(item)) {
             Id: p.Id
         }, {
             context: context
-        }) + '">' + p.Name + '</a>';
+        }) + '">' + escapeHtml(p.Name) + '</a>';
     }).join(', ');
 
     const genresLabel = page.querySelector('.genresLabel');
@@ -969,7 +980,7 @@ function renderWriter(page, item, context) {
             Id: person.Id
         }, {
             context: context
-        }) + '">' + person.Name + '</a>';
+        }) + '">' + escapeHtml(person.Name) + '</a>';
     }).join(', ');
 
     const writersLabel = page.querySelector('.writersLabel');
@@ -998,7 +1009,7 @@ function renderDirector(page, item, context) {
             Id: person.Id
         }, {
             context: context
-        }) + '">' + person.Name + '</a>';
+        }) + '">' + escapeHtml(person.Name) + '</a>';
     }).join(', ');
 
     const directorsLabel = page.querySelector('.directorsLabel');
@@ -1051,7 +1062,7 @@ function renderTagline(page, item) {
 
     if (item.Taglines && item.Taglines.length) {
         taglineElement.classList.remove('hide');
-        taglineElement.innerHTML = item.Taglines[0];
+        taglineElement.innerText = item.Taglines[0];
     } else {
         taglineElement.classList.add('hide');
     }
@@ -1118,7 +1129,7 @@ function renderMoreFromSeason(view, item, apiClient) {
             }
 
             section.classList.remove('hide');
-            section.querySelector('h2').innerHTML = globalize.translate('MoreFromValue', item.SeasonName);
+            section.querySelector('h2').innerText = globalize.translate('MoreFromValue', item.SeasonName);
             const itemsContainer = section.querySelector('.itemsContainer');
             cardBuilder.buildCards(result.Items, {
                 parentContainer: section,
@@ -1177,9 +1188,9 @@ function renderMoreFromArtist(view, item, apiClient) {
             section.classList.remove('hide');
 
             if (item.Type === 'MusicArtist') {
-                section.querySelector('h2').innerHTML = globalize.translate('HeaderAppearsOn');
+                section.querySelector('h2').innerText = globalize.translate('HeaderAppearsOn');
             } else {
-                section.querySelector('h2').innerHTML = globalize.translate('MoreFromValue', item.AlbumArtists[0].Name);
+                section.querySelector('h2').innerText = globalize.translate('MoreFromValue', item.AlbumArtists[0].Name);
             }
 
             cardBuilder.buildCards(result.Items, {
@@ -1269,7 +1280,7 @@ function renderSeriesAirTime(page, item, isStatic) {
     }
     if (item.Studios.length) {
         if (isStatic) {
-            html += ' on ' + item.Studios[0].Name;
+            html += ' on ' + escapeHtml(item.Studios[0].Name);
         } else {
             const context = inferContext(item);
             const href = appRouter.getRouteUrl(item.Studios[0], {
@@ -1277,7 +1288,7 @@ function renderSeriesAirTime(page, item, isStatic) {
                 itemType: 'Studio',
                 serverId: item.ServerId
             });
-            html += ' on <a class="textlink button-link" is="emby-linkbutton" href="' + href + '">' + item.Studios[0].Name + '</a>';
+            html += ' on <a class="textlink button-link" is="emby-linkbutton" href="' + href + '">' + escapeHtml(item.Studios[0].Name) + '</a>';
         }
     }
     if (html) {
@@ -1303,7 +1314,7 @@ function renderTags(page, item) {
     }
 
     if (tagElements.length) {
-        itemTags.innerHTML = globalize.translate('TagsValue', tagElements.join(', '));
+        itemTags.innerText = globalize.translate('TagsValue', tagElements.join(', '));
         itemTags.classList.remove('hide');
     } else {
         itemTags.innerHTML = '';
@@ -1318,7 +1329,9 @@ function renderChildren(page, item) {
         Fields: fields
     };
 
-    if (item.Type !== 'BoxSet') {
+    if (item.Type == 'MusicAlbum') {
+        query.SortBy = 'ParentIndexNumber,IndexNumber,SortName';
+    } else if (item.Type !== 'BoxSet') {
         query.SortBy = 'SortName';
     }
 
@@ -1916,10 +1929,6 @@ export default function (view, params) {
         playCurrentItem(this, this.getAttribute('data-action'));
     }
 
-    function onPosterClick(e) {
-        itemShortcuts.onClick.call(view.querySelector('.detailImageContainer'), e);
-    }
-
     function onInstantMixClick() {
         playbackManager.instantMix(currentItem);
     }
@@ -2015,7 +2024,7 @@ export default function (view, params) {
         bindAll(view, '.btnCancelSeriesTimer', 'click', onCancelSeriesTimerClick);
         bindAll(view, '.btnCancelTimer', 'click', onCancelTimerClick);
         bindAll(view, '.btnDownload', 'click', onDownloadClick);
-        view.querySelector('.detailImageContainer').addEventListener('click', onPosterClick);
+        view.querySelector('.detailImageContainer').addEventListener('click', onPlayClick);
         view.querySelector('.trackSelections').addEventListener('submit', onTrackSelectionsSubmit);
         view.querySelector('.btnSplitVersions').addEventListener('click', function () {
             splitVersions(self, view, apiClient, params);
@@ -2033,7 +2042,7 @@ export default function (view, params) {
 
             if (e.detail.isRestored) {
                 if (currentItem) {
-                    appRouter.setTitle('');
+                    libraryMenu.setTitle('');
                     renderTrackSelections(page, self, currentItem, true);
                     renderBackdrop(currentItem);
                 }

@@ -2,7 +2,7 @@ import backdrop from '../backdrop/backdrop';
 import * as mainTabsManager from '../maintabsmanager';
 import layoutManager from '../layoutManager';
 import '../../elements/emby-tabs/emby-tabs';
-import { appRouter } from '../appRouter';
+import LibraryMenu from '../../scripts/libraryMenu';
 
 function onViewDestroy() {
     const tabControllers = this.tabControllers;
@@ -21,10 +21,6 @@ function onViewDestroy() {
     this.params = null;
     this.currentTabController = null;
     this.initialTabIndex = null;
-}
-
-function onBeforeTabChange() {
-
 }
 
 class TabbedView {
@@ -79,7 +75,7 @@ class TabbedView {
         view.addEventListener('viewbeforehide', this.onPause.bind(this));
 
         view.addEventListener('viewbeforeshow', function () {
-            mainTabsManager.setTabs(view, currentTabIndex, self.getTabs, getTabContainers, onBeforeTabChange, onTabChange, false);
+            mainTabsManager.setTabs(view, currentTabIndex, self.getTabs, getTabContainers, null, onTabChange, false);
         });
 
         view.addEventListener('viewshow', function (e) {
@@ -109,8 +105,9 @@ class TabbedView {
             currentTabController.onPause();
         }
     }
+
     setTitle() {
-        appRouter.setTitle('');
+        LibraryMenu.setTitle('');
     }
 }
 

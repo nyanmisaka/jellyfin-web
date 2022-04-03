@@ -715,10 +715,6 @@ class AppRouter {
         Dashboard.navigate('home.html?tab=1');
     }
 
-    setTitle(title) {
-        LibraryMenu.setTitle(title);
-    }
-
     getRouteUrl(item, options) {
         if (!item) {
             throw new Error('item cannot be null');
@@ -757,13 +753,7 @@ class AppRouter {
         }
 
         if (item === 'nextup') {
-            url = '#!/list.html?type=nextup&serverId=' + options.serverId;
-
-            if (options.rewatching) {
-                url += '&rewatching=' + options.rewatching;
-            }
-
-            return url;
+            return '#!/list.html?type=nextup&serverId=' + options.serverId;
         }
 
         if (item === 'list') {
