@@ -112,7 +112,7 @@
     "OptionHasThemeVideo": "Video de Fundal",
     "OptionHideUser": "Ascunde acest utilizator din pagina de autentificare",
     "OptionHideUserFromLoginHelp": "Folositor pentru conturi private sau de administrator ascunse. Utilizatorul va trebui să se conecteze manual prin introducerea numelui de utilizator și a parolei.",
-    "OptionImdbRating": "Rating IMDb",
+    "OptionImdbRating": "Evaluare IMDb",
     "OptionLikes": "Like-uri",
     "OptionParentalRating": "Limită de vârstă",
     "OptionPlayCount": "Contorizare rulări",
@@ -1648,5 +1648,6 @@
     "EnableGamepadHelp": "Ascultați intrarea de la orice controler conectat.",
     "LabelEnableGamepad": "Activați Gamepad",
     "Controls": "Controale",
-    "UseEpisodeImagesInNextUpHelp": "Secțiunile „Următorul” și „Continuați vizionarea” vor folosi imagini ale episoadelor ca miniaturi în loc de miniatura principală a emisiunii."
+    "UseEpisodeImagesInNextUpHelp": "Secțiunile „Următorul” și „Continuați vizionarea” vor folosi imagini ale episoadelor ca miniaturi în loc de miniatura principală a emisiunii.",
+    "EnableEnhancedNvdecDecoderHelp": "Implementare experimentală a NVDEC. Activați această opțiune doar dacă întâmpinați erori de decodare."
 }

@@ -969,7 +969,7 @@
     "RememberMe": "记住我",
     "RemoveFromCollection": "从集合中移除",
     "RemoveFromPlaylist": "从播放列表中移除",
-    "Repeat": "重播",
+    "Repeat": "循环模式",
     "RepeatAll": "全部循环",
     "RepeatMode": "循环模式",
     "RepeatOne": "单项循环",
@@ -1649,5 +1649,6 @@
     "OriginalAirDate": "原始播出日期",
     "Digital": "数字的",
     "MessageUnauthorizedUser": "您目前无权访问服务器。请联系您的服务器管理员以获取更多信息。",
-    "EnableEnhancedNvdecDecoderHelp": "实验性的 NVDEC 实现，除非你遇到了解码错误，否则不要启用此选项。"
+    "EnableEnhancedNvdecDecoderHelp": "实验性的 NVDEC 实现，除非你遇到了解码错误，否则不要启用此选项。",
+    "HomeVideosPhotos": "主页视频及照片"
 }

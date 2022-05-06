@@ -19,7 +19,7 @@ import '../../elements/emby-button/emby-button';
 import '../../assets/css/flexstyles.scss';
 import '../../elements/emby-itemscontainer/emby-itemscontainer';
 import taskButton from '../../scripts/taskbutton';
-import Dashboard from '../../scripts/clientUtils';
+import Dashboard from '../../utils/dashboard';
 import ServerConnections from '../../components/ServerConnections';
 import alert from '../../components/alert';
 import confirm from '../../components/confirm/confirm';
@@ -175,7 +175,8 @@ import confirm from '../../components/confirm/confirm';
 
             if (!result.Items.length) {
                 view.querySelector('.activeRecordingsSection').classList.add('hide');
-                return void(itemsContainer.innerHTML = '');
+                itemsContainer.innerHTML = '';
+                return;
             }
 
             view.querySelector('.activeRecordingsSection').classList.remove('hide');

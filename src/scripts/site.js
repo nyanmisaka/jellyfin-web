@@ -25,7 +25,7 @@ import './libraryMenu';
 import './routes';
 import '../components/themeMediaPlayer';
 import './autoBackdrops';
-import { pageClassOn, serverAddress } from './clientUtils';
+import { pageClassOn, serverAddress } from '../utils/dashboard';
 import './screensavermanager';
 import './serverNotifications';
 import '../components/playback/playerSelectionMenu';
@@ -40,35 +40,6 @@ import SyncPlayHtmlVideoPlayer from '../components/syncPlay/ui/players/HtmlVideo
 import SyncPlayHtmlAudioPlayer from '../components/syncPlay/ui/players/HtmlAudioPlayer';
 import { currentSettings } from './settings/userSettings';
 import taskButton from './taskbutton';
-
-// TODO: Move this elsewhere
-window.getWindowLocationSearch = function(win) {
-    let search = (win || window).location.search;
-
-    if (!search) {
-        const index = window.location.href.indexOf('?');
-
-        if (index != -1) {
-            search = window.location.href.substring(index);
-        }
-    }
-
-    return search || '';
-};
-
-// TODO: Move this elsewhere
-window.getParameterByName = function(name, url) {
-    name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-    const regexS = '[\\?&]' + name + '=([^&#]*)';
-    const regex = new RegExp(regexS, 'i');
-    const results = regex.exec(url || getWindowLocationSearch());
-
-    if (results == null) {
-        return '';
-    }
-
-    return decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
 
 function loadCoreDictionary() {
     const languages = ['af', 'ar', 'be-by', 'bg-bg', 'bn_bd', 'ca', 'cs', 'da', 'de', 'el', 'en-gb', 'en-us', 'eo', 'es', 'es-419', 'es-ar', 'es_do', 'es-mx', 'fa', 'fi', 'fil', 'fr', 'fr-ca', 'gl', 'gsw', 'he', 'hi-in', 'hr', 'hu', 'id', 'it', 'ja', 'kk', 'ko', 'lt-lt', 'mr', 'ms', 'nb', 'nl', 'pl', 'pr', 'pt', 'pt-br', 'pt-pt', 'ro', 'ru', 'sk', 'sl-si', 'sq', 'sv', 'ta', 'th', 'tr', 'uk', 'ur_pk', 'vi', 'zh-cn', 'zh-hk', 'zh-tw'];
@@ -192,10 +163,11 @@ async function onAppReady() {
         import('../assets/css/ios.scss');
     }
 
-    appRouter.start({
-        click: false,
-        hashbang: true
+    Events.on(appHost, 'resume', () => {
+        ServerConnections.currentApiClient()?.ensureWebSocket();
     });
+
+    appRouter.start();
 
     if (!browser.tv && !browser.xboxOne && !browser.ps4) {
         import('../components/nowPlayingBar/nowPlayingBar');

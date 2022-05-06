@@ -24,6 +24,7 @@ import shell from '../../../scripts/shell';
 import SubtitleSync from '../../../components/subtitlesync/subtitlesync';
 import { appRouter } from '../../../components/appRouter';
 import LibraryMenu from '../../../scripts/libraryMenu';
+import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components/backdrop/backdrop';
 
 /* eslint-disable indent */
 
@@ -55,14 +56,16 @@ import LibraryMenu from '../../../scripts/libraryMenu';
                     recordingButtonManager = null;
                 }
 
-                return void view.querySelector('.btnRecord').classList.add('hide');
+                view.querySelector('.btnRecord').classList.add('hide');
+                return;
             }
 
             ServerConnections.getApiClient(item.ServerId).getCurrentUser().then(function (user) {
                 if (user.Policy.EnableLiveTvManagement) {
                     import('../../../components/recordingcreator/recordingbutton').then(({default: RecordingButton}) => {
                         if (recordingButtonManager) {
-                            return void recordingButtonManager.refreshItem(item);
+                            recordingButtonManager.refreshItem(item);
+                            return;
                         }
 
                         recordingButtonManager = new RecordingButton({
@@ -1323,7 +1326,7 @@ import LibraryMenu from '../../../scripts/libraryMenu';
 
         view.addEventListener('viewbeforeshow', function () {
             headerElement.classList.add('osdHeader');
-            appRouter.setTransparency('full');
+            setBackdropTransparency(TRANSPARENCY_LEVEL.Full);
         });
         view.addEventListener('viewshow', function () {
             try {
@@ -1450,7 +1453,8 @@ import LibraryMenu from '../../../scripts/libraryMenu';
         /* eslint-disable-next-line compat/compat */
         dom.addEventListener(view, window.PointerEvent ? 'pointerdown' : 'click', function (e) {
             if (dom.parentWithClass(e.target, ['videoOsdBottom', 'upNextContainer'])) {
-                return void showOsd();
+                showOsd();
+                return;
             }
 
             const pointerType = e.pointerType || (layoutManager.mobile ? 'touch' : 'mouse');

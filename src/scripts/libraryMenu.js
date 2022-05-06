@@ -16,9 +16,10 @@ import '../elements/emby-button/paper-icon-button-light';
 import 'material-design-icons-iconfont';
 import '../assets/css/scrollstyles.scss';
 import '../assets/css/flexstyles.scss';
-import Dashboard, { pageClassOn } from './clientUtils';
+import Dashboard, { pageClassOn } from '../utils/dashboard';
 import ServerConnections from '../components/ServerConnections';
 import Headroom from 'headroom.js';
+import { getParameterByName } from '../utils/url.ts';
 
 /* eslint-disable indent */
 
@@ -645,7 +646,8 @@ import Headroom from 'headroom.js';
         if (!user) {
             showBySelector('.libraryMenuDownloads', false);
             showBySelector('.lnkSyncToOtherDevices', false);
-            return void showBySelector('.userMenuOptions', false);
+            showBySelector('.userMenuOptions', false);
+            return;
         }
 
         if (user.Policy.EnableContentDownloading) {
@@ -897,8 +899,8 @@ import Headroom from 'headroom.js';
         navDrawerScrollContainer = navDrawerElement.querySelector('.scrollContainer');
         navDrawerScrollContainer.addEventListener('click', onMainDrawerClick);
         return new Promise(function (resolve) {
-            import('../libraries/navdrawer/navdrawer').then(({ NavigationDrawer }) => {
-                navDrawerInstance = new NavigationDrawer(getNavDrawerOptions());
+            import('../libraries/navdrawer/navdrawer').then(({ default: NavDrawer }) => {
+                navDrawerInstance = new NavDrawer(getNavDrawerOptions());
 
                 if (!layoutManager.tv) {
                     navDrawerElement.classList.remove('hide');
@@ -957,7 +959,8 @@ import Headroom from 'headroom.js';
 
     function setTitle (title) {
         if (title == null) {
-            return void LibraryMenu.setDefaultTitle();
+            LibraryMenu.setDefaultTitle();
+            return;
         }
 
         if (title === '-') {

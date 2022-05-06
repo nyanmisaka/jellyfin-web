@@ -5,11 +5,13 @@ import { appRouter } from '../components/appRouter';
 import baseAlert from '../components/alert';
 import baseConfirm from '../components/confirm/confirm';
 import globalize from '../scripts/globalize';
-import * as webSettings from './settings/webSettings';
+import * as webSettings from '../scripts/settings/webSettings';
 import datetime from '../scripts/datetime';
+import { setBackdropTransparency } from '../components/backdrop/backdrop';
 import DirectoryBrowser from '../components/directorybrowser/directorybrowser';
 import dialogHelper from '../components/dialogHelper/dialogHelper';
 import itemIdentifier from '../components/itemidentifier/itemidentifier';
+import { getLocationSearch } from './url.ts';
 
 export function getCurrentUser() {
     return window.ApiClient.getCurrentUser(false);
@@ -85,7 +87,7 @@ export function getCurrentUserId() {
     return null;
 }
 
-export function onServerChanged(userId, accessToken, apiClient) {
+export function onServerChanged(_userId, _accessToken, apiClient) {
     ServerConnections.setLocalApiClient(apiClient);
 }
 
@@ -112,7 +114,7 @@ export function navigate(url, preserveQueryString) {
         throw new Error('url cannot be null or empty');
     }
 
-    const queryString = getWindowLocationSearch();
+    const queryString = getLocationSearch();
 
     if (preserveQueryString && queryString) {
         url += queryString;
@@ -233,7 +235,8 @@ const Dashboard = {
     datetime,
     DirectoryBrowser,
     dialogHelper,
-    itemIdentifier
+    itemIdentifier,
+    setBackdropTransparency
 };
 
 // This is used in plugins and templates, so keep it defined for now.

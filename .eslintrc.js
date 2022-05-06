@@ -51,6 +51,7 @@ module.exports = {
         'no-restricted-globals': ['error'].concat(restrictedGlobals),
         'no-trailing-spaces': ['error'],
         '@babel/no-unused-expressions': ['error', { 'allowShortCircuit': true, 'allowTernary': true, 'allowTaggedTemplates': true }],
+        'no-void': ['error', { 'allowAsStatement': true }],
         'one-var': ['error', 'never'],
         'padded-blocks': ['error', 'never'],
         'prefer-const': ['error', {'destructuring': 'all'}],
@@ -161,6 +162,17 @@ module.exports = {
         ]
     },
     overrides: [
+        // Config files and development scripts
+        {
+            files: [
+                './babel.config.js',
+                './.eslintrc.js',
+                './postcss.config.js',
+                './webpack.*.js',
+                './scripts/**/*.js'
+            ]
+        },
+        // JavaScript source files
         {
             files: [
                 './src/**/*.js',
@@ -193,8 +205,6 @@ module.exports = {
                 'DlnaProfilePage': 'writable',
                 'DashboardPage': 'writable',
                 'Emby': 'readonly',
-                'getParameterByName': 'writable',
-                'getWindowLocationSearch': 'writable',
                 'Globalize': 'writable',
                 'Hls': 'writable',
                 'dfnshelper': 'writable',
@@ -212,6 +222,7 @@ module.exports = {
             rules: {
             }
         },
+        // TypeScript source files
         {
             files: [
                 './src/**/*.ts',

@@ -1,9 +1,8 @@
 import { SyncPlayUserAccessType, UserDto } from '@thornbill/jellyfin-sdk/dist/generated-client';
 import React, { FunctionComponent, useCallback, useEffect, useState, useRef } from 'react';
-import Dashboard from '../../scripts/clientUtils';
+import Dashboard from '../../utils/dashboard';
 import globalize from '../../scripts/globalize';
 import LibraryMenu from '../../scripts/libraryMenu';
-import { appRouter } from '../appRouter';
 import ButtonElement from '../dashboard/users/ButtonElement';
 import CheckBoxElement from '../dashboard/users/CheckBoxElement';
 import CheckBoxListItem from '../dashboard/users/CheckBoxListItem';
@@ -15,6 +14,7 @@ import SelectSyncPlayAccessElement from '../dashboard/users/SelectSyncPlayAccess
 import SectionTabs from '../dashboard/users/SectionTabs';
 import loading from '../loading/loading';
 import toast from '../toast/toast';
+import { getParameterByName } from '../../utils/url';
 
 type ItemsArr = {
     Name?: string;
@@ -40,7 +40,7 @@ const UserEditPage: FunctionComponent = () => {
     };
 
     const getUser = () => {
-        const userId = appRouter.param('userId');
+        const userId = getParameterByName('userId');
         return window.ApiClient.getUser(userId);
     };
 
