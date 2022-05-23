@@ -135,7 +135,7 @@ export class UserSettings {
             return this.set('preferFmp4HlsContainer', val.toString(), false);
         }
 
-        return toBoolean(this.get('preferFmp4HlsContainer', false), false);
+        return toBoolean(this.get('preferFmp4HlsContainer', false), true);
     }
 
     /**
