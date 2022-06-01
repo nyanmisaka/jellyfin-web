@@ -7,10 +7,12 @@ import { playbackManager } from '../../components/playback/playbackmanager';
 import { appRouter } from '../../components/appRouter';
 import {
     bindEventsToHlsPlayer,
+    destroyShakaPlayer,
     destroyHlsPlayer,
     destroyFlvPlayer,
     destroyCastPlayer,
     getCrossOriginValue,
+    enableShakaPlayer,
     enableHlsJsPlayer,
     applySrc,
     resetSrc,
@@ -92,6 +94,17 @@ function tryRemoveElement(elem) {
     function requireHlsPlayer(callback) {
         import('hls.js').then(({default: hls}) => {
             window.Hls = hls;
+            callback();
+        });
+    }
+
+    function requireShakaPlayer(callback) {
+        Promise.all([
+            import('mux.js'),
+            import('shaka-player'),
+        ]).then(([muxjs, shaka]) => {
+            window.muxjs = muxjs;
+            window.Shaka = shaka;
             callback();
         });
     }
@@ -245,6 +258,11 @@ function tryRemoveElement(elem) {
          * @type {any | undefined}
          */
         _hlsPlayer;
+        /**
+         * @private (used in other files)
+         * @type {any | null | undefined}
+         */
+        _shakaPlayer;
         /**
          * @private (used in other files)
          * @type {any | null | undefined}
@@ -421,6 +439,72 @@ function tryRemoveElement(elem) {
         /**
          * @private
          */
+        onShakaError(error) {
+            console.error('shaka: error code', error.code, 'object', error);
+        }
+
+        /**
+         * @private
+         * @param e {Event} The event received from the `<video>` element
+         */
+        onShakaErrorEvent = (e) => {
+            // Extract the shaka.util.Error object from the event.
+            this.onShakaError(e.detail);
+        }
+
+        /**
+         * @private
+         */
+        setSrcWithShakaPlayer(elem, options, url) {
+            return new Promise((resolve, reject) => {
+                requireShakaPlayer(async () => {
+                    Shaka.polyfill.installAll();
+                    if (Shaka.Player.isBrowserSupported()) {
+                        const shakaPlayer = new Shaka.Player(elem);
+
+                        shakaPlayer.configure({
+                            streaming: {
+                                retryParameters: {
+                                    maxAttempts: 6
+                                },
+                                forceTransmuxTS: true,
+                                rebufferingGoal: 5,
+                                bufferingGoal: 30,
+                                bufferBehind: 30,
+                                inaccurateManifestTolerance: 5
+                            },
+                            abr: {
+                                enabled: false
+                            }
+                        });
+
+                        shakaPlayer.addEventListener('error', this.onShakaErrorEvent);
+
+                        shakaPlayer.load(url).then(() => {
+                            console.debug('shaka: loaded manifest');
+
+                            // This runs if the asynchronous load is successful.
+                            resolve();
+                        }).catch((err) => {
+                            this.onShakaError(err);
+                            reject();
+                        });
+
+                        this._shakaPlayer = shakaPlayer;
+
+                        // This is needed in setCurrentTrackElement
+                        this.#currentSrc = url;
+                    } else {
+                        console.error('shaka: unsupported browser!');
+                        reject();
+                    }
+                });
+            });
+        }
+
+        /**
+         * @private
+         */
         async setCurrentSrc(elem, options) {
             elem.removeEventListener('error', this.onError);
 
@@ -433,6 +517,7 @@ function tryRemoveElement(elem) {
                 val += `#t=${seconds}`;
             }
 
+            await destroyShakaPlayer(this);
             destroyHlsPlayer(this);
             destroyFlvPlayer(this);
             destroyCastPlayer(this);
@@ -453,6 +538,13 @@ function tryRemoveElement(elem) {
             if (crossOrigin) {
                 elem.crossOrigin = crossOrigin;
             }
+
+            import('../../scripts/settings/userSettings').then((userSettings) => {
+                const preferFmp4Hls = userSettings.preferFmp4HlsContainer();
+                if (preferFmp4Hls && enableShakaPlayer() && val.includes('.m3u8') && val.includes('&SegmentContainer=mp4')) {
+                    return this.setSrcWithShakaPlayer(elem, options, val);
+                }
+            });
 
             if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && val.includes('.m3u8')) {
                 return this.setSrcWithHlsJs(elem, options, val);
@@ -689,6 +781,7 @@ function tryRemoveElement(elem) {
         }
 
         destroy() {
+            destroyShakaPlayer(this);
             destroyHlsPlayer(this);
             destroyFlvPlayer(this);
 
@@ -761,6 +854,16 @@ function tryRemoveElement(elem) {
             if (time && !this.#timeUpdated) {
                 this.#timeUpdated = true;
                 this.ensureValidVideo(elem);
+            }
+
+            const duration = elem.duration;
+            const mediaSource = (this._currentPlayOptions || {}).mediaSource;
+
+            // Shaka may not fire the ended event due to the imprecise timestamps caused by seeking hls,
+            // (video.currentTime > RunTimeTicks), so manually end it 5s early.
+            if (time && duration && (time > mediaSource.RunTimeTicks / 10000000) && Math.abs(duration - time) < 5) {
+                this.destroyCustomTrack(elem);
+                onEndedInternal(this, elem, this.onError);
             }
 
             this.#currentTime = time;
@@ -1852,7 +1955,7 @@ function tryRemoveElement(elem) {
             link = null;
         }
 
-        if (this._hlsPlayer) {
+        if (this._hlsPlayer || this._shakaPlayer) {
             mediaCategory.stats.push({
                 label: globalize.translate('LabelStreamType'),
                 value: 'HLS'
