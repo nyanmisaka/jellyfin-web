@@ -1657,5 +1657,6 @@
     "LabelVppTonemappingBrightness": "VPP 色调映射亮度增益：",
     "LabelVppTonemappingBrightnessHelp": "为 VPP 色调映射应用亮度增益。推荐值和默认值均为 0。",
     "LabelVppTonemappingContrast": "VPP 色调映射对比度增益：",
-    "LabelVppTonemappingContrastHelp": "为 VPP 色调映射应用对比度增益。推荐值和默认值分别为 1.2 和 1。"
+    "LabelVppTonemappingContrastHelp": "为 VPP 色调映射应用对比度增益。推荐值和默认值分别为 1.2 和 1。",
+    "VideoRangeTypeNotSupported": "视频色彩范围不支持"
 }
