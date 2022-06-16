@@ -699,12 +699,6 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components
             updateTimeDisplay(playState.PositionTicks, nowPlayingItem.RunTimeTicks, playState.PlaybackStartTimeTicks, playState.PlaybackRate, playState.BufferedRanges || []);
             updateNowPlayingInfo(player, state);
 
-            if (state.MediaSource && state.MediaSource.SupportsTranscoding && supportedCommands.indexOf('SetMaxStreamingBitrate') !== -1) {
-                view.querySelector('.btnVideoOsdSettings').classList.remove('hide');
-            } else {
-                view.querySelector('.btnVideoOsdSettings').classList.add('hide');
-            }
-
             const isProgressClear = state.MediaSource && state.MediaSource.RunTimeTicks == null;
             nowPlayingPositionSlider.setIsClear(isProgressClear);
 
@@ -745,7 +739,9 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components
                         const currentTimeMs = (playbackStartTimeTicks + (positionTicks || 0)) / 1e4;
                         const programRuntimeMs = programEndDateMs - programStartDateMs;
 
-                        if (nowPlayingPositionSlider.value = getDisplayPercentByTimeOfDay(programStartDateMs, programRuntimeMs, currentTimeMs), bufferedRanges.length) {
+                        nowPlayingPositionSlider.value = getDisplayPercentByTimeOfDay(programStartDateMs, programRuntimeMs, currentTimeMs);
+
+                        if (bufferedRanges.length) {
                             const rangeStart = getDisplayPercentByTimeOfDay(programStartDateMs, programRuntimeMs, (playbackStartTimeTicks + (bufferedRanges[0].start || 0)) / 1e4);
                             const rangeEnd = getDisplayPercentByTimeOfDay(programStartDateMs, programRuntimeMs, (playbackStartTimeTicks + (bufferedRanges[0].end || 0)) / 1e4);
                             nowPlayingPositionSlider.setBufferedRanges([{
@@ -882,6 +878,8 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components
                 const player = currentPlayer;
 
                 if (player) {
+                    const state = playbackManager.getPlayerState(player);
+
                     // show subtitle offset feature only if player and media support it
                     const showSubOffset = playbackManager.supportSubtitleOffset(player) &&
                         playbackManager.canHandleOffsetOnCurrentSubtitle(player);
@@ -890,6 +888,7 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components
                         mediaType: 'Video',
                         player: player,
                         positionTo: btn,
+                        quality: state.MediaSource?.SupportsTranscoding,
                         stats: true,
                         suboffset: showSubOffset,
                         onOption: onSettingsOption

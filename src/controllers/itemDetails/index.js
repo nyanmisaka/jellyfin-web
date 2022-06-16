@@ -1507,13 +1507,13 @@ function renderChildren(page, item) {
 }
 
 function renderItemsByName(page, item) {
-    import('../../scripts/itembynamedetailpage').then(() => {
-        window.ItemsByName.renderItems(page, item);
+    import('../../scripts/itemsByName').then(({ default: ItemsByName }) => {
+        ItemsByName.renderItems(page, item);
     });
 }
 
 function renderPlaylistItems(page, item) {
-    import('../../scripts/playlistedit').then(() => {
+    import('../../scripts/playlistViewer').then(({ default: PlaylistViewer }) => {
         PlaylistViewer.render(page, item);
     });
 }
@@ -1786,7 +1786,11 @@ function renderAdditionalParts(page, item, user) {
 function renderScenes(page, item) {
     let chapters = item.Chapters || [];
 
-    if (chapters.length && !chapters[0].ImageTag && (chapters = []), chapters.length) {
+    if (chapters.length && !chapters[0].ImageTag) {
+        chapters = [];
+    }
+
+    if (chapters.length) {
         page.querySelector('#scenesCollapsible').classList.remove('hide');
         const scenesContent = page.querySelector('#scenesContent');
 

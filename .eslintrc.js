@@ -61,7 +61,8 @@ module.exports = {
         'no-var': ['error'],
         'space-before-blocks': ['error'],
         'space-infix-ops': 'error',
-        'yoda': 'error'
+        'yoda': 'error',
+        'no-sequences': ['error', { 'allowInParentheses': false }]
     },
     settings: {
         react: {
@@ -214,7 +215,6 @@ module.exports = {
                 'LiveTvHelpers': 'writable',
                 'Loading': 'writable',
                 'MetadataEditor': 'writable',
-                'PlaylistViewer': 'writable',
                 'ServerNotifications': 'writable',
                 'TaskButton': 'writable',
                 'UserParentalControlPage': 'writable',
