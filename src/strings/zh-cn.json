@@ -1658,5 +1658,16 @@
     "LabelVppTonemappingBrightnessHelp": "为 VPP 色调映射应用亮度增益。推荐值和默认值均为 0。",
     "LabelVppTonemappingContrast": "VPP 色调映射对比度增益：",
     "LabelVppTonemappingContrastHelp": "为 VPP 色调映射应用对比度增益。推荐值和默认值分别为 1.2 和 1。",
-    "VideoRangeTypeNotSupported": "视频色彩范围不支持"
+    "VideoRangeTypeNotSupported": "视频色彩范围不支持",
+    "LabelVideoRangeType": "动态范围类型：",
+    "MediaInfoVideoRangeType": "动态范围类型",
+    "MediaInfoDoViTitle": "杜比视界标题",
+    "MediaInfoDvVersionMajor": "杜比视界主要版本",
+    "MediaInfoDvVersionMinor": "杜比视界次要版本",
+    "MediaInfoDvProfile": "杜比视界配置",
+    "MediaInfoDvLevel": "杜比视界等级",
+    "MediaInfoRpuPresentFlag": "杜比视界 RPU 存在标记",
+    "MediaInfoElPresentFlag": "杜比视界 EL 存在标记",
+    "MediaInfoBlPresentFlag": "杜比视界 BL 存在标记",
+    "MediaInfoDvBlSignalCompatibilityId": "杜比视界 BL 兼容性序号"
 }
