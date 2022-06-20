@@ -28,6 +28,36 @@
     pointer-events: none;
 }
 
+.osdLeftButtons {
+    margin-right: auto;
+}
+
+.layout-mobile .osdPlayControlButtons {
+    left: 0;
+    right: 0;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    top: 50%;
+    margin-top: -2em;
+    font-size: 110%;
+}
+
+.layout-mobile .osdPlayControlButtons .btnPause {
+    margin-left: 12%;
+    margin-right: 12%;
+    font-size: 140%;
+}
+
+.layout-mobile .osdPlayControlButtons button {
+    text-shadow: 1px 1px 4px rgb(0 0 0 / 20%);
+}
+
+.layout-mobile .osdPlayControlButtons .material-icons:before {
+    font-size: 160%;
+}
+
 .skinHeader-withBackground.osdHeader {
     transition: opacity 0.3s ease-out;
     position: relative;
@@ -156,7 +186,6 @@
 
 .osdTimeText {
     margin-left: 1em;
-    margin-right: auto;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -244,21 +273,9 @@
 }
 
 @media all and (max-width: 43em) {
+    .videoOsdBottom .osdTimeText,
     .videoOsdBottom .volumeButtons,
     .osdMediaStatus span {
-        display: none !important;
-    }
-}
-
-@media all and (max-width: 50em) {
-    .videoOsdBottom .btnFastForward,
-    .videoOsdBottom .btnRewind {
-        display: none !important;
-    }
-}
-
-@media all and (max-width: 75em) {
-    .videoOsdBottom .endsAtText {
         display: none !important;
     }
 }
