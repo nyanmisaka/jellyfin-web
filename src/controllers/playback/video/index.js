@@ -204,17 +204,10 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components
                 includeIndexNumber: item.Type !== 'Program'
             });
 
-            if (itemName && parentName) {
-                itemName = `${parentName} - ${itemName}`;
-            }
-
-            if (!itemName) {
-                itemName = parentName || '';
-            }
+            let title = parentName || itemName || '';
 
             // Display the item with its premiere date if it has one
-            let title = itemName;
-            if (item.PremiereDate) {
+            if (!layoutManager.mobile && title && item.PremiereDate) {
                 try {
                     const year = datetime.parseISO8601Date(item.PremiereDate).getFullYear();
                     title += ` (${year})`;
@@ -223,7 +216,13 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components
                 }
             }
 
+            // Main title: TV Shows (2000)
             LibraryMenu.setTitle(title);
+
+            // Osd title: S01E01 - Episode Name
+            if (itemName && parentName) {
+                view.querySelector('.osdTitle').innerHTML = itemName;
+            }
 
             const documentTitle = parentName || (item ? item.Name : null);
 
