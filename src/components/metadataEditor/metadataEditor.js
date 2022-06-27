@@ -1088,7 +1088,9 @@ import template from './metadataEditor.template.html';
 
     export default {
         show: function (itemId, serverId) {
-            return new Promise(resolve => show(itemId, serverId, resolve));
+            return new Promise(function (resolve) {
+                return show(itemId, serverId, resolve);
+            });
         },
 
         embed: function (elem, itemId, serverId) {
