@@ -1658,7 +1658,7 @@
     "LabelVppTonemappingBrightnessHelp": "为 VPP 色调映射应用亮度增益。推荐值和默认值均为 0。",
     "LabelVppTonemappingContrast": "VPP 色调映射对比度增益：",
     "LabelVppTonemappingContrastHelp": "为 VPP 色调映射应用对比度增益。推荐值和默认值分别为 1.2 和 1。",
-    "VideoRangeTypeNotSupported": "视频色彩范围不支持",
+    "VideoRangeTypeNotSupported": "视频动态范围不支持",
     "LabelVideoRangeType": "动态范围类型：",
     "MediaInfoVideoRangeType": "动态范围类型",
     "MediaInfoDoViTitle": "杜比视界标题",
