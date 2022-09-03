@@ -159,8 +159,8 @@ import browser from './browser';
             return true;
         }
 
-        if (browser.edgeChromium && browser.windows) {
-            return true;
+        if (browser.edgeChromium || browser.chrome) {
+            return !browser.iOS && !browser.osx && !browser.mobile;
         }
 
         if (browser.edgeUwp) {
