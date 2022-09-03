@@ -525,7 +525,7 @@ import browser from './browser';
         const hlsInFmp4VideoCodecs = [];
 
         if (canPlayHevc(videoTestElement, options)) {
-            if (browser.edgeChromium || browser.safari || browser.tizen || browser.web0s) {
+            if (browser.chrome || browser.edgeChromium || browser.safari || browser.tizen || browser.web0s) {
                 hlsInFmp4VideoCodecs.push('hevc');
             }
         }
@@ -889,7 +889,13 @@ import browser from './browser';
             av1VideoRangeTypes += '|HDR10|HLG';
         }
 
-        if (browser.edgeChromium || browser.chrome || browser.firefox) {
+        if (browser.chrome) {
+            hevcVideoRangeTypes += '|HDR10|HLG';
+            vp9VideoRangeTypes += '|HDR10|HLG';
+            av1VideoRangeTypes += '|HDR10|HLG';
+        }
+
+        if (browser.edgeChromium || browser.firefox) {
             vp9VideoRangeTypes += '|HDR10|HLG';
             av1VideoRangeTypes += '|HDR10|HLG';
         }
