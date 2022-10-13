@@ -160,7 +160,7 @@ import browser from './browser';
         }
 
         if (browser.edgeChromium || browser.chrome) {
-            return !browser.iOS && !browser.osx && !browser.mobile;
+            return !browser.iOS && !browser.osx;
         }
 
         if (browser.edgeUwp) {
@@ -715,7 +715,7 @@ import browser from './browser';
 
         if (canPlayHls() && options.enableHls !== false) {
             const nativeFmp4 = (browser.iOS && browser.iOSVersion >= 11) || browser.osx || browser.tizen || browser.web0s;
-            const shakaFmp4 = !browser.mobile && (browser.edgeChromium || browser.chrome || browser.firefox);
+            const shakaFmp4 = !browser.mobile && (browser.edgeChromium || browser.firefox) || browser.chrome;
             const enableFmp4Hls = userSettings.preferFmp4HlsContainer() && (nativeFmp4 || shakaFmp4);
             if (hlsInFmp4VideoCodecs.length && hlsInFmp4VideoAudioCodecs.length && enableFmp4Hls) {
                 profile.TranscodingProfiles.push({
@@ -889,7 +889,7 @@ import browser from './browser';
             av1VideoRangeTypes += '|HDR10|HLG';
         }
 
-        if (browser.chrome) {
+        if (browser.chrome && !browser.mobile) {
             hevcVideoRangeTypes += '|HDR10|HLG';
             vp9VideoRangeTypes += '|HDR10|HLG';
             av1VideoRangeTypes += '|HDR10|HLG';

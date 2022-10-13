@@ -47,7 +47,7 @@ import { Events } from 'jellyfin-apiclient';
                 return false;
             }
 
-            if (!browser.mobile && (browser.edgeChromium || browser.chrome || browser.firefox)) {
+            if (!browser.mobile && (browser.edgeChromium || browser.firefox) || browser.chrome) {
                 return true;
             }
         }
