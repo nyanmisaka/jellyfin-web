@@ -118,14 +118,13 @@ function tryRemoveElement(elem) {
         });
     }
 
-    function requireShakaPlayer(callback) {
-        Promise.all([
+    function requireShakaPlayer() {
+        return Promise.all([
             import('mux.js'),
-            import('shaka-player'),
+            import('shaka-player')
         ]).then(([muxjs, shaka]) => {
             window.muxjs = muxjs;
             window.Shaka = shaka;
-            callback();
         });
     }
 
@@ -476,49 +475,43 @@ function tryRemoveElement(elem) {
          * @private
          */
         setSrcWithShakaPlayer(elem, options, url) {
-            return new Promise((resolve, reject) => {
-                requireShakaPlayer(async () => {
-                    Shaka.polyfill.installAll();
-                    if (Shaka.Player.isBrowserSupported()) {
-                        const shakaPlayer = new Shaka.Player(elem);
+            return requireShakaPlayer().then(() => {
+                Shaka.polyfill.installAll();
+                if (Shaka.Player.isBrowserSupported()) {
+                    const shakaPlayer = new Shaka.Player(elem);
 
-                        shakaPlayer.configure({
-                            streaming: {
-                                retryParameters: {
-                                    maxAttempts: 6
-                                },
-                                forceTransmuxTS: true,
-                                rebufferingGoal: 5,
-                                bufferingGoal: 30,
-                                bufferBehind: 30,
-                                inaccurateManifestTolerance: 5
+                    shakaPlayer.configure({
+                        streaming: {
+                            retryParameters: {
+                                maxAttempts: 6
                             },
-                            abr: {
-                                enabled: false
-                            }
-                        });
+                            forceTransmuxTS: true,
+                            rebufferingGoal: 5,
+                            bufferingGoal: 30,
+                            bufferBehind: 30,
+                            inaccurateManifestTolerance: 5
+                        },
+                        abr: {
+                            enabled: false
+                        }
+                    });
 
-                        shakaPlayer.addEventListener('error', this.onShakaErrorEvent);
+                    shakaPlayer.addEventListener('error', this.onShakaErrorEvent);
 
-                        shakaPlayer.load(url).then(() => {
-                            console.debug('shaka: loaded manifest');
-
-                            // This runs if the asynchronous load is successful.
-                            resolve();
-                        }).catch((err) => {
-                            this.onShakaError(err);
-                            reject();
-                        });
-
-                        this._shakaPlayer = shakaPlayer;
-
+                    this._shakaPlayer = shakaPlayer;
+                    return shakaPlayer.load(url).then(() => {
+                        console.debug('shaka: loaded manifest');
                         // This is needed in setCurrentTrackElement
                         this.#currentSrc = url;
-                    } else {
-                        console.error('shaka: unsupported browser!');
-                        reject();
-                    }
-                });
+                        return Promise.resolve();
+                    }).catch((err) => {
+                        this.onShakaError(err);
+                        return Promise.reject();
+                    });
+                } else {
+                    console.error('shaka: unsupported browser!');
+                    return Promise.reject();
+                }
             });
         }
 
@@ -559,32 +552,30 @@ function tryRemoveElement(elem) {
                 elem.crossOrigin = crossOrigin;
             }
 
-            import('../../scripts/settings/userSettings').then((userSettings) => {
+            return import('../../scripts/settings/userSettings').then(async (userSettings) => {
                 const preferFmp4Hls = userSettings.preferFmp4HlsContainer();
                 if (preferFmp4Hls && enableShakaPlayer() && val.includes('.m3u8') && val.includes('&SegmentContainer=mp4')) {
                     return this.setSrcWithShakaPlayer(elem, options, val);
+                } else if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && val.includes('.m3u8')) {
+                    return this.setSrcWithHlsJs(elem, options, val);
+                } else if (options.playMethod !== 'Transcode' && options.mediaSource.Container === 'flv') {
+                    return this.setSrcWithFlvJs(elem, options, val);
+                } else {
+                    elem.autoplay = true;
+
+                    const includeCorsCredentials = await getIncludeCorsCredentials();
+                    if (includeCorsCredentials) {
+                        // Safari will not send cookies without this
+                        elem.crossOrigin = 'use-credentials';
+                    }
+
+                    return applySrc(elem, val, options).then(() => {
+                        this.#currentSrc = val;
+
+                        return playWithPromise(elem, this.onError);
+                    });
                 }
             });
-
-            if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && val.includes('.m3u8')) {
-                return this.setSrcWithHlsJs(elem, options, val);
-            } else if (options.playMethod !== 'Transcode' && options.mediaSource.Container === 'flv') {
-                return this.setSrcWithFlvJs(elem, options, val);
-            } else {
-                elem.autoplay = true;
-
-                const includeCorsCredentials = await getIncludeCorsCredentials();
-                if (includeCorsCredentials) {
-                    // Safari will not send cookies without this
-                    elem.crossOrigin = 'use-credentials';
-                }
-
-                return applySrc(elem, val, options).then(() => {
-                    this.#currentSrc = val;
-
-                    return playWithPromise(elem, this.onError);
-                });
-            }
         }
 
         setSubtitleStreamIndex(index) {

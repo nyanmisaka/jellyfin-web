@@ -268,18 +268,13 @@ import { Events } from 'jellyfin-apiclient';
     export function destroyShakaPlayer(instance) {
         const player = instance._shakaPlayer;
         if (player) {
-            try {
-                return player.destroy().then(() => {
-                    instance._shakaPlayer = null;
-                });
-            } catch (err) {
+            instance._shakaPlayer = null;
+            return player.destroy().catch((err) => {
                 console.error(err);
-            }
+            });
         }
 
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     export function destroyFlvPlayer(instance) {
