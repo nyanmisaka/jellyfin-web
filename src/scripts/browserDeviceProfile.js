@@ -300,6 +300,8 @@ import browser from './browser';
         return bitrate;
     }
 
+    let maxChannelCount = null;
+
     function getSpeakerCount() {
         if (maxChannelCount != null) {
             return maxChannelCount;
