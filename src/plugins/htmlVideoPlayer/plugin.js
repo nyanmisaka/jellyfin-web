@@ -486,7 +486,7 @@ function tryRemoveElement(elem) {
                             retryParameters: {
                                 maxAttempts: 6
                             },
-                            forceTransmuxTS: true,
+                            forceTransmux: true,
                             rebufferingGoal: 5,
                             bufferingGoal: 30,
                             bufferBehind: 30,
