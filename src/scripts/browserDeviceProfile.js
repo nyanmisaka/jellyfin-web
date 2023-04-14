@@ -771,8 +771,6 @@ import browser from './browser';
         }
 
         // Progressive mp4 transcoding
-        // Disable for now since it causes audio and video out of sync.
-/*
         if (mp4VideoCodecs.length && videoAudioCodecs.length) {
             profile.TranscodingProfiles.push({
                 Container: 'mp4',
@@ -793,7 +791,7 @@ import browser from './browser';
             Context: 'Static',
             Protocol: 'http'
         });
-*/
+
         profile.ContainerProfiles = [];
 
         profile.CodecProfiles = [];
