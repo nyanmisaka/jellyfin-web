@@ -713,30 +713,6 @@ import browser from './browser';
             });
         });
 
-        if (canPlayMkv && !browser.tizen && options.enableMkvProgressive !== false) {
-            profile.TranscodingProfiles.push({
-                Container: 'mkv',
-                Type: 'Video',
-                AudioCodec: videoAudioCodecs.join(','),
-                VideoCodec: mp4VideoCodecs.join(','),
-                Context: 'Streaming',
-                MaxAudioChannels: physicalAudioChannels.toString(),
-                CopyTimestamps: true
-            });
-        }
-
-        if (canPlayMkv) {
-            profile.TranscodingProfiles.push({
-                Container: 'mkv',
-                Type: 'Video',
-                AudioCodec: videoAudioCodecs.join(','),
-                VideoCodec: mp4VideoCodecs.join(','),
-                Context: 'Static',
-                MaxAudioChannels: physicalAudioChannels.toString(),
-                CopyTimestamps: true
-            });
-        }
-
         if (canPlayHls() && options.enableHls !== false) {
             const nativeFmp4 = (browser.iOS && browser.iOSVersion >= 11) || browser.osx || browser.tizen || browser.web0s;
             const shakaFmp4 = !browser.mobile && (browser.edgeChromium || browser.firefox) || browser.chrome;
@@ -769,28 +745,6 @@ import browser from './browser';
                 });
             }
         }
-
-        // Progressive mp4 transcoding
-        if (mp4VideoCodecs.length && videoAudioCodecs.length) {
-            profile.TranscodingProfiles.push({
-                Container: 'mp4',
-                Type: 'Video',
-                AudioCodec: videoAudioCodecs.join(','),
-                VideoCodec: mp4VideoCodecs.join(','),
-                Context: 'Streaming',
-                Protocol: 'http',
-                MaxAudioChannels: physicalAudioChannels.toString()
-            });
-        }
-
-        profile.TranscodingProfiles.push({
-            Container: 'mp4',
-            Type: 'Video',
-            AudioCodec: videoAudioCodecs.join(','),
-            VideoCodec: 'h264',
-            Context: 'Static',
-            Protocol: 'http'
-        });
 
         profile.ContainerProfiles = [];
 
