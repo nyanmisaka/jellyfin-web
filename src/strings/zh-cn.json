@@ -1353,7 +1353,7 @@
     "LabelOpenclDevice": "OpenCL 设备：",
     "LabelOpenclDeviceHelp": "这是用于色调映射的 OpenCL 设备。 点左边是平台号，右边是平台上的设备号。 默认值为 0.0。 需要支持OpenCL 硬件加速的 FFmpeg 应用程序。",
     "EnableTonemapping": "启用色调映射",
-    "AllowTonemappingHelp": "色调映射可以将视频的动态范围从 HDR 变换成 SDR，同时保持图像细节与颜色等对于表现原始场景非常重要的信息。目前仅对 HDR10 或 HLG 视频生效。此项需要对应的 OpenCL 或 CUDA 运行库。",
+    "AllowTonemappingHelp": "色调映射可以将视频的动态范围从 HDR 变换成 SDR，同时保持图像细节与颜色等对于表现原始场景非常重要的信息。目前仅对 10bit HDR10，HLG 和 DoVi 视频生效。此项需要对应的 OpenCL 或 CUDA 运行库。",
     "LabelTonemappingAlgorithm": "选择要使用的色调映射算法：",
     "TonemappingAlgorithmHelp": "色调映射可以微调。如果你不是很熟悉这些选项，保持默认即可。建议值为 'BT.2390'。",
     "LabelTonemappingRange": "色调映射范围：",
@@ -1655,9 +1655,9 @@
     "LabelTextWeight": "文字大小：",
     "EnableSplashScreen": "启用闪屏",
     "LabelVppTonemappingBrightness": "VPP 色调映射亮度增益：",
-    "LabelVppTonemappingBrightnessHelp": "为 VPP 色调映射应用亮度增益。推荐值和默认值均为 0。",
+    "LabelVppTonemappingBrightnessHelp": "为 VPP 色调映射应用亮度增益。推荐值和默认值分别为 16 和 0。",
     "LabelVppTonemappingContrast": "VPP 色调映射对比度增益：",
-    "LabelVppTonemappingContrastHelp": "为 VPP 色调映射应用对比度增益。推荐值和默认值分别为 1.2 和 1。",
+    "LabelVppTonemappingContrastHelp": "为 VPP 色调映射应用对比度增益。推荐值和默认值均为 1。",
     "VideoRangeTypeNotSupported": "视频动态范围不支持",
     "LabelVideoRangeType": "动态范围类型：",
     "MediaInfoVideoRangeType": "动态范围类型",
@@ -1669,5 +1669,7 @@
     "MediaInfoRpuPresentFlag": "杜比视界 RPU 存在标记",
     "MediaInfoElPresentFlag": "杜比视界 EL 存在标记",
     "MediaInfoBlPresentFlag": "杜比视界 BL 存在标记",
-    "MediaInfoDvBlSignalCompatibilityId": "杜比视界 BL 兼容性序号"
+    "MediaInfoDvBlSignalCompatibilityId": "杜比视界 BL 兼容性序号",
+    "LabelTonemappingMode": "色调映射模式：",
+    "TonemappingModeHelp": "如果您遇到高光过曝问题，请尝试切换到 RGB 模式。"
 }
