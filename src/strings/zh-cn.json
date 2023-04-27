@@ -1671,5 +1671,6 @@
     "MediaInfoBlPresentFlag": "杜比视界 BL 存在标记",
     "MediaInfoDvBlSignalCompatibilityId": "杜比视界 BL 兼容性序号",
     "LabelTonemappingMode": "色调映射模式：",
-    "TonemappingModeHelp": "如果您遇到高光过曝问题，请尝试切换到 RGB 模式。"
+    "TonemappingModeHelp": "如果您遇到高光过曝问题，请尝试切换到 RGB 模式。",
+    "AllowAv1Encoding": "允许以 AV1 格式编码"
 }
