@@ -1,6 +1,7 @@
 import browser from '../../scripts/browser';
 import { Events } from 'jellyfin-apiclient';
 import { appHost } from '../../components/apphost';
+import alert from '../../components/alert';
 import loading from '../../components/loading/loading';
 import dom from '../../scripts/dom';
 import { playbackManager } from '../../components/playback/playbackmanager';
@@ -456,12 +457,7 @@ function tryRemoveElement(elem) {
             });
         }
 
-        /**
-         * @private
-         */
-        onShakaError(error) {
-            console.error('shaka: error code', error.code, 'object', error);
-        }
+        /* global Shaka */
 
         /**
          * @private
@@ -470,6 +466,36 @@ function tryRemoveElement(elem) {
         onShakaErrorEvent = (e) => {
             // Extract the shaka.util.Error object from the event.
             this.onShakaError(e.detail);
+        };
+
+        /**
+         * @private
+         */
+        onShakaError(error) {
+            console.error('Shaka: error code', error.code, 'object', error);
+            if (Shaka && this._shakaPlayer) {
+                switch (error.category) {
+                    case Shaka.util.Error.Category.NETWORK:
+                    case Shaka.util.Error.Category.MEDIA:
+                        if (error.severity == Shaka.util.Error.Severity.RECOVERABLE) {
+                            console.debug('Recoverable Shaka error encountered, try to recover');
+                            this._shakaPlayer.retryStreaming();
+                            return;
+                        } else if (error.severity == Shaka.util.Error.Severity.CRITICAL) {
+                            console.debug('Cannot recover from Shaka error - destroy and trigger error');
+                            this.stop();
+                        }
+                        break;
+                    default:
+                        console.debug('Cannot recover from Shaka error - destroy and trigger error');
+                        this.stop();
+                        break;
+                }
+                alert({
+                    text: globalize.translate('PlaybackErrorNoCompatibleStream'),
+                    title: globalize.translate('HeaderPlaybackError')
+                });
+            }
         }
 
         /**
@@ -479,12 +505,13 @@ function tryRemoveElement(elem) {
             return requireShakaPlayer().then(() => {
                 Shaka.polyfill.installAll();
                 if (Shaka.Player.isBrowserSupported()) {
-                    const shakaPlayer = new Shaka.Player(elem);
-
-                    shakaPlayer.configure({
+                    this._shakaPlayer = new Shaka.Player(elem);
+                    this._shakaPlayer.addEventListener('error', this.onShakaErrorEvent);
+                    this._shakaPlayer.configure({
                         streaming: {
                             retryParameters: {
-                                maxAttempts: 6
+                                baseDelay: 1500,
+                                maxAttempts: 3
                             },
                             forceTransmux: true,
                             rebufferingGoal: 5,
@@ -496,21 +523,17 @@ function tryRemoveElement(elem) {
                             enabled: false
                         }
                     });
-
-                    shakaPlayer.addEventListener('error', this.onShakaErrorEvent);
-
-                    this._shakaPlayer = shakaPlayer;
-                    return shakaPlayer.load(url).then(() => {
-                        console.debug('shaka: loaded manifest');
+                    return this._shakaPlayer.load(url).then(() => {
+                        console.debug('Shaka: loaded manifest');
                         // This is needed in setCurrentTrackElement
                         this.#currentSrc = url;
                         return Promise.resolve();
                     }).catch((err) => {
-                        this.onShakaError(err);
+                        console.error('Shaka: failed loading manifest!');
                         return Promise.reject();
                     });
                 } else {
-                    console.error('shaka: unsupported browser!');
+                    console.error('Shaka: unsupported browser!');
                     return Promise.reject();
                 }
             });
