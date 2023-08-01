@@ -59,13 +59,13 @@ import { getParameterByName } from '../../../utils/url.ts';
 
                 html += '<div class="listItem listItem-border">';
                 html += '<span class="material-icons listItemIcon schedule" aria-hidden="true"></span>';
-                if (trigger.MaxRuntimeMs) {
+                if (trigger.MaxRuntimeTicks) {
                     html += '<div class="listItemBody two-line">';
                 } else {
                     html += '<div class="listItemBody">';
                 }
                 html += "<div class='listItemBodyText'>" + ScheduledTaskPage.getTriggerFriendlyName(trigger) + '</div>';
-                if (trigger.MaxRuntimeMs) {
+                if (trigger.MaxRuntimeTicks) {
                     html += '<div class="listItemBodyText secondary">';
                     const hours = trigger.MaxRuntimeTicks / 36e9;
                     if (hours == 1) {
@@ -203,7 +203,7 @@ import { getParameterByName } from '../../../utils/url.ts';
             let timeLimit = $('#txtTimeLimit', page).val() || '0';
             timeLimit = parseFloat(timeLimit) * 3600000;
 
-            trigger.MaxRuntimeMs = timeLimit || null;
+            trigger.MaxRuntimeTicks = timeLimit * 1e4 || null;
 
             return trigger;
         }
