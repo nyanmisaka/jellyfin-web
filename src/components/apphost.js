@@ -3,7 +3,6 @@ import appSettings from '../scripts/settings/appSettings';
 import browser from '../scripts/browser';
 import { Events } from 'jellyfin-apiclient';
 import * as htmlMediaHelper from '../components/htmlMediaHelper';
-import * as userSettings from '../scripts/settings/userSettings';
 import * as webSettings from '../scripts/settings/webSettings';
 import globalize from '../scripts/globalize';
 import profileBuilder from '../scripts/browserDeviceProfile';
@@ -12,18 +11,15 @@ const appName = 'Jellyfin Web';
 
 function getBaseProfileOptions(item) {
     const disableHlsVideoAudioCodecs = [];
-    const preferFmp4Hls = userSettings.preferFmp4HlsContainer();
-
-    if (item) {
-        if (preferFmp4Hls && htmlMediaHelper.enableShakaPlayer()) {
-            // do nothing
-        } else if (htmlMediaHelper.enableHlsJsPlayer(item.RunTimeTicks, item.MediaType)) {
-            if (browser.edge) {
-                disableHlsVideoAudioCodecs.push('mp3');
-            }
-
+    if (item && htmlMediaHelper.enableHlsJsPlayer(item.RunTimeTicks, item.MediaType)) {
+        if (browser.edge) {
+            disableHlsVideoAudioCodecs.push('mp3');
+        }
+        if (!browser.edgeChromium) {
             disableHlsVideoAudioCodecs.push('ac3');
             disableHlsVideoAudioCodecs.push('eac3');
+        }
+        if (!(browser.chrome || browser.edgeChromium || browser.firefox)) {
             disableHlsVideoAudioCodecs.push('opus');
         }
     }

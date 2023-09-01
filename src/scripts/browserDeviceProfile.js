@@ -74,6 +74,14 @@ import browser from './browser';
         return false;
     }
 
+    function canPlayNativeHlsInFmp4() {
+        if (browser.tizenVersion >= 3 || browser.web0sVersion >= 3.5) {
+            return true;
+        }
+
+        return (browser.iOS && browser.iOSVersion >= 11) || browser.osx;
+    }
+
     function canPlayHlsWithMSE() {
         // text tracks don’t work with this in firefox
         return window.MediaSource != null; /* eslint-disable-line compat/compat */
@@ -554,6 +562,7 @@ import browser from './browser';
 
         if (canPlayAv1(videoTestElement)) {
             if (!browser.mobile && (browser.chrome || browser.edgeChromium || browser.firefox)) {
+                // disable av1 on mobile since it can be very slow software decoding
                 hlsInFmp4VideoCodecs.push('av1');
             }
         }
@@ -723,9 +732,10 @@ import browser from './browser';
         });
 
         if (canPlayHls() && options.enableHls !== false) {
-            const nativeFmp4 = (browser.iOS && browser.iOSVersion >= 11) || browser.osx || browser.tizen || browser.web0s;
-            const shakaFmp4 = !browser.mobile && (browser.edgeChromium || browser.firefox) || browser.chrome;
-            const enableFmp4Hls = userSettings.preferFmp4HlsContainer() && (nativeFmp4 || shakaFmp4);
+            let enableFmp4Hls = userSettings.preferFmp4HlsContainer();
+            if ((browser.safari || browser.tizen || browser.web0s) && !canPlayNativeHlsInFmp4()) {
+                enableFmp4Hls = false;
+            }
             if (hlsInFmp4VideoCodecs.length && hlsInFmp4VideoAudioCodecs.length && enableFmp4Hls) {
                 profile.TranscodingProfiles.push({
                     Container: 'mp4',
@@ -896,18 +906,15 @@ import browser from './browser';
         }
 
         if (browser.tizen || browser.web0s) {
-            hevcVideoRangeTypes += '|HDR10|HLG|DOVI';
-            vp9VideoRangeTypes += '|HDR10|HLG';
-            av1VideoRangeTypes += '|HDR10|HLG';
-        }
-
-        if (browser.chrome && !browser.mobile) {
             hevcVideoRangeTypes += '|HDR10|HLG';
             vp9VideoRangeTypes += '|HDR10|HLG';
             av1VideoRangeTypes += '|HDR10|HLG';
         }
 
-        if (browser.edgeChromium || browser.firefox) {
+        // Chrome mobile and Firefox have no client side tone-mapping
+        // Edge Chromium on Nvidia is known to have color issues on 10-bit video
+        if (browser.chrome && !browser.mobile) {
+            hevcVideoRangeTypes += '|HDR10|HLG';
             vp9VideoRangeTypes += '|HDR10|HLG';
             av1VideoRangeTypes += '|HDR10|HLG';
         }

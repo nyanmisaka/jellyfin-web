@@ -34,27 +34,6 @@ import { Events } from 'jellyfin-apiclient';
         return false;
     }
 
-    export function enableShakaPlayer() {
-        /* eslint-disable-next-line compat/compat */
-        if (!!window.MediaSource && !!window.MediaSource.isTypeSupported) {
-            // safari support native hls.
-            if (browser.iOS || browser.osx) {
-                return false;
-            }
-
-            // The native players on these devices support seeking live streams, no need to use shaka here
-            if (browser.tizen || browser.web0s) {
-                return false;
-            }
-
-            if (!browser.mobile && (browser.edgeChromium || browser.firefox) || browser.chrome) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     export function enableHlsJsPlayer(runTimeTicks, mediaType) {
         if (window.MediaSource == null) {
             return false;
@@ -71,23 +50,15 @@ import { Events } from 'jellyfin-apiclient';
         }
 
         if (canPlayNativeHls()) {
-            // Having trouble with chrome's native support and transcoded music
-            if (browser.android && mediaType === 'Audio') {
+            // Android Webview's native HLS has performance and compatiblity issues
+            if (browser.android) {
                 return true;
-            }
-
-            if (browser.edge && mediaType === 'Video') {
-                //return true;
             }
 
             // simple playback should use the native support
             if (runTimeTicks) {
-                //if (!browser.edge) {
                 return false;
-                //}
             }
-
-            //return false;
         }
 
         return true;
@@ -265,18 +236,6 @@ import { Events } from 'jellyfin-apiclient';
         }
     }
 
-    export function destroyShakaPlayer(instance) {
-        const player = instance._shakaPlayer;
-        if (player) {
-            instance._shakaPlayer = null;
-            return player.destroy().catch((err) => {
-                console.error(err);
-            });
-        }
-
-        return Promise.resolve();
-    }
-
     export function destroyFlvPlayer(instance) {
         const player = instance._flvPlayer;
         if (player) {
@@ -382,7 +341,6 @@ import { Events } from 'jellyfin-apiclient';
 
         resetSrc(elem);
 
-        destroyShakaPlayer(instance);
         destroyHlsPlayer(instance);
         destroyFlvPlayer(instance);
         destroyCastPlayer(instance);

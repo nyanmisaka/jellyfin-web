@@ -3,19 +3,16 @@ import DOMPurify from 'dompurify';
 import browser from '../../scripts/browser';
 import { Events } from 'jellyfin-apiclient';
 import { appHost } from '../../components/apphost';
-import alert from '../../components/alert';
 import loading from '../../components/loading/loading';
 import dom from '../../scripts/dom';
 import { playbackManager } from '../../components/playback/playbackmanager';
 import { appRouter } from '../../components/appRouter';
 import {
     bindEventsToHlsPlayer,
-    destroyShakaPlayer,
     destroyHlsPlayer,
     destroyFlvPlayer,
     destroyCastPlayer,
     getCrossOriginValue,
-    enableShakaPlayer,
     enableHlsJsPlayer,
     applySrc,
     resetSrc,
@@ -119,16 +116,6 @@ function tryRemoveElement(elem) {
         import('hls.js').then(({default: hls}) => {
             window.Hls = hls;
             callback();
-        });
-    }
-
-    function requireShakaPlayer() {
-        return Promise.all([
-            import('mux.js'),
-            import('shaka-player')
-        ]).then(([muxjs, shaka]) => {
-            window.muxjs = muxjs;
-            window.Shaka = shaka;
         });
     }
 
@@ -285,11 +272,6 @@ function tryRemoveElement(elem) {
          * @private (used in other files)
          * @type {any | null | undefined}
          */
-        _shakaPlayer;
-        /**
-         * @private (used in other files)
-         * @type {any | null | undefined}
-         */
         _castPlayer;
         /**
          * @private (used in other files)
@@ -440,6 +422,7 @@ function tryRemoveElement(elem) {
                     const includeCorsCredentials = await getIncludeCorsCredentials();
 
                     const hls = new Hls({
+                        startPosition: options.playerStartPositionTicks / 10000000,
                         manifestLoadingTimeOut: 20000,
                         maxBufferLength: maxBufferLength,
                         xhrSetup(xhr) {
@@ -459,88 +442,6 @@ function tryRemoveElement(elem) {
             });
         }
 
-        /* global Shaka */
-
-        /**
-         * @private
-         * @param e {Event} The event received from the `<video>` element
-         */
-        onShakaErrorEvent = (e) => {
-            // Extract the shaka.util.Error object from the event.
-            this.onShakaError(e.detail);
-        };
-
-        /**
-         * @private
-         */
-        onShakaError(error) {
-            console.error('Shaka: error code', error.code, 'object', error);
-            if (Shaka && this._shakaPlayer) {
-                switch (error.category) {
-                    case Shaka.util.Error.Category.NETWORK:
-                    case Shaka.util.Error.Category.MEDIA:
-                        if (error.severity == Shaka.util.Error.Severity.RECOVERABLE) {
-                            console.debug('Recoverable Shaka error encountered, try to recover');
-                            this._shakaPlayer.retryStreaming();
-                            return;
-                        } else if (error.severity == Shaka.util.Error.Severity.CRITICAL) {
-                            console.debug('Cannot recover from Shaka error - destroy and trigger error');
-                            this.stop();
-                        }
-                        break;
-                    default:
-                        console.debug('Cannot recover from Shaka error - destroy and trigger error');
-                        this.stop();
-                        break;
-                }
-                alert({
-                    text: globalize.translate('PlaybackErrorNoCompatibleStream'),
-                    title: globalize.translate('HeaderPlaybackError')
-                });
-            }
-        }
-
-        /**
-         * @private
-         */
-        setSrcWithShakaPlayer(elem, options, url) {
-            return requireShakaPlayer().then(() => {
-                Shaka.polyfill.installAll();
-                if (Shaka.Player.isBrowserSupported()) {
-                    this._shakaPlayer = new Shaka.Player(elem);
-                    this._shakaPlayer.addEventListener('error', this.onShakaErrorEvent);
-                    this._shakaPlayer.configure({
-                        streaming: {
-                            retryParameters: {
-                                baseDelay: 1500,
-                                maxAttempts: 3
-                            },
-                            forceTransmux: true,
-                            rebufferingGoal: 5,
-                            bufferingGoal: 30,
-                            bufferBehind: 30,
-                            inaccurateManifestTolerance: 5
-                        },
-                        abr: {
-                            enabled: false
-                        }
-                    });
-                    return this._shakaPlayer.load(url).then(() => {
-                        console.debug('Shaka: loaded manifest');
-                        // This is needed in setCurrentTrackElement
-                        this.#currentSrc = url;
-                        return Promise.resolve();
-                    }).catch((err) => {
-                        console.error('Shaka: failed loading manifest!');
-                        return Promise.reject();
-                    });
-                } else {
-                    console.error('Shaka: unsupported browser!');
-                    return Promise.reject();
-                }
-            });
-        }
-
         /**
          * @private
          */
@@ -556,7 +457,6 @@ function tryRemoveElement(elem) {
                 val += `#t=${seconds}`;
             }
 
-            await destroyShakaPlayer(this);
             destroyHlsPlayer(this);
             destroyFlvPlayer(this);
             destroyCastPlayer(this);
@@ -578,30 +478,25 @@ function tryRemoveElement(elem) {
                 elem.crossOrigin = crossOrigin;
             }
 
-            return import('../../scripts/settings/userSettings').then(async (userSettings) => {
-                const preferFmp4Hls = userSettings.preferFmp4HlsContainer();
-                if (preferFmp4Hls && enableShakaPlayer() && val.includes('.m3u8') && val.includes('&SegmentContainer=mp4')) {
-                    return this.setSrcWithShakaPlayer(elem, options, val);
-                } else if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && val.includes('.m3u8')) {
-                    return this.setSrcWithHlsJs(elem, options, val);
-                } else if (options.playMethod !== 'Transcode' && options.mediaSource.Container === 'flv') {
-                    return this.setSrcWithFlvJs(elem, options, val);
-                } else {
-                    elem.autoplay = true;
+            if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && val.includes('.m3u8')) {
+                return this.setSrcWithHlsJs(elem, options, val);
+            } else if (options.playMethod !== 'Transcode' && options.mediaSource.Container === 'flv') {
+                return this.setSrcWithFlvJs(elem, options, val);
+            } else {
+                elem.autoplay = true;
 
-                    const includeCorsCredentials = await getIncludeCorsCredentials();
-                    if (includeCorsCredentials) {
-                        // Safari will not send cookies without this
-                        elem.crossOrigin = 'use-credentials';
-                    }
-
-                    return applySrc(elem, val, options).then(() => {
-                        this.#currentSrc = val;
-
-                        return playWithPromise(elem, this.onError);
-                    });
+                const includeCorsCredentials = await getIncludeCorsCredentials();
+                if (includeCorsCredentials) {
+                    // Safari will not send cookies without this
+                    elem.crossOrigin = 'use-credentials';
                 }
-            });
+
+                return applySrc(elem, val, options).then(() => {
+                    this.#currentSrc = val;
+
+                    return playWithPromise(elem, this.onError);
+                });
+            }
         }
 
         setSubtitleStreamIndex(index) {
@@ -815,7 +710,6 @@ function tryRemoveElement(elem) {
         }
 
         destroy() {
-            destroyShakaPlayer(this);
             destroyHlsPlayer(this);
             destroyFlvPlayer(this);
 
@@ -888,16 +782,6 @@ function tryRemoveElement(elem) {
             if (time && !this.#timeUpdated) {
                 this.#timeUpdated = true;
                 this.ensureValidVideo(elem);
-            }
-
-            const duration = elem.duration;
-            const mediaSource = (this._currentPlayOptions || {}).mediaSource;
-
-            // Shaka may not fire the ended event due to the imprecise timestamps caused by seeking hls,
-            // (video.currentTime > RunTimeTicks), so manually end it 5s early.
-            if (time && duration && (time > mediaSource.RunTimeTicks / 10000000) && Math.abs(duration - time) < 5) {
-                this.destroyCustomTrack(elem);
-                onEndedInternal(this, elem, this.onError);
             }
 
             this.#currentTime = time;
@@ -1992,7 +1876,7 @@ function tryRemoveElement(elem) {
             link = null;
         }
 
-        if (this._hlsPlayer || this._shakaPlayer) {
+        if (this._hlsPlayer) {
             mediaCategory.stats.push({
                 label: globalize.translate('LabelStreamType'),
                 value: 'HLS'
