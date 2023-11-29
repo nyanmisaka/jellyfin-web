@@ -31,6 +31,12 @@ import browser from './browser';
             return true;
         }
 
+        // edgeChromium broke the AV1 hardware decoding support in 117+,
+        // and it can't decode AV1 in software as a fallback either.
+        if (browser.edgeChromium && browser.versionMajor >= 117) {
+            return false;
+        }
+
         // av1 main level 5.3
         return !!videoTestElement.canPlayType &&
         (videoTestElement.canPlayType('video/mp4; codecs="av01.0.15M.08"').replace(/no/, '') &&
