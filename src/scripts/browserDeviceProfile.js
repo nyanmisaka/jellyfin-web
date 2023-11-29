@@ -913,6 +913,7 @@ import browser from './browser';
 
         if (browser.tizen || browser.web0s) {
             hevcVideoRangeTypes += '|HDR10|HLG';
+            if (browser.web0s) hevcVideoRangeTypes += '|DOVI';
             vp9VideoRangeTypes += '|HDR10|HLG';
             av1VideoRangeTypes += '|HDR10|HLG';
         }
