@@ -834,10 +834,9 @@ import browser from './browser';
             maxH264Level = 52;
         }
 
-        if (browser.tizen ||
-            videoTestElement.canPlayType('video/mp4; codecs="avc1.6e0033"').replace(/no/, '')) {
+        if (videoTestElement.canPlayType('video/mp4; codecs="avc1.6e0033"').replace(/no/, '')) {
             // These tests are passing in safari, but playback is failing
-            if (!browser.safari && !browser.iOS && !browser.web0s && !browser.edge && !browser.mobile) {
+            if (!browser.safari && !browser.iOS && !browser.web0s && !browser.edge && !browser.mobile && !browser.tizen) {
                 h264Profiles += '|high 10';
             }
         }
