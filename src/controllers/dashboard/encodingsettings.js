@@ -192,13 +192,13 @@ import alert from '../../components/alert';
                 page.querySelector('#txtVaapiDevice').removeAttribute('required');
             }
 
-            if (this.value == 'amf' || this.value == 'nvenc' || this.value == 'qsv' || this.value == 'vaapi' || this.value == 'videotoolbox') {
+            if (this.value == 'amf' || this.value == 'nvenc' || this.value == 'qsv' || this.value == 'vaapi' || this.value == 'rkmpp' || this.value == 'videotoolbox') {
                 page.querySelector('.fld10bitHevcVp9HwDecoding').classList.remove('hide');
             } else {
                 page.querySelector('.fld10bitHevcVp9HwDecoding').classList.add('hide');
             }
 
-            if (this.value == 'amf' || this.value == 'nvenc' || this.value == 'qsv' || this.value == 'vaapi') {
+            if (this.value == 'amf' || this.value == 'nvenc' || this.value == 'qsv' || this.value == 'vaapi' || this.value == 'rkmpp') {
                 page.querySelector('.tonemappingOptions').classList.remove('hide');
             } else {
                 page.querySelector('.tonemappingOptions').classList.add('hide');
