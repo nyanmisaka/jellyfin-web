@@ -587,11 +587,7 @@ import browser from './browser';
         }
 
         if (canPlayHevc(videoTestElement, options)) {
-            // safari is lying on HDR and 60fps videos, use fMP4 instead
-            if (!browser.safari) {
-                mp4VideoCodecs.push('hevc');
-            }
-
+            mp4VideoCodecs.push('hevc');
             if (browser.tizen || browser.web0s) {
                 hlsInTsVideoCodecs.push('hevc');
             }
@@ -1086,6 +1082,24 @@ import browser from './browser';
                 Condition: 'LessThanEqual',
                 Property: 'VideoBitrate',
                 Value: av1MaxVideoBitrate,
+                IsRequired: true
+            });
+        }
+
+        if (browser.safari) {
+            // On Safari, only hvc1 & dvh1 are supported
+            hevcCodecProfileConditions.push({
+                Condition: 'EqualsAny',
+                Property: 'VideoCodecTag',
+                Value: 'hvc1|dvh1',
+                IsRequired: true
+            });
+
+            // On Safari, framerate about 60 is not supported
+            hevcCodecProfileConditions.push({
+                Condition: 'LessThanEqual',
+                Property: 'VideoFramerate',
+                Value: '60',
                 IsRequired: true
             });
         }
