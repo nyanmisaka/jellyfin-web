@@ -425,6 +425,7 @@ function tryRemoveElement(elem) {
                         startPosition: options.playerStartPositionTicks / 10000000,
                         manifestLoadingTimeOut: 20000,
                         maxBufferLength: maxBufferLength,
+                        videoPreference: { preferHDR: true },
                         xhrSetup(xhr) {
                             xhr.withCredentials = includeCorsCredentials;
                         }
