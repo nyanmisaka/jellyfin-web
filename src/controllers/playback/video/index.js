@@ -237,19 +237,12 @@ export default function (view) {
             includeIndexNumber: item.Type !== 'Program'
         });
 
-        if (itemName && parentName) {
-            itemName = `${parentName} - ${itemName}`;
-        }
-
-        if (!itemName) {
-            itemName = parentName || '';
-        }
+        let title = parentName || itemName || '';
 
         // Display the item with its premiere date if it has one
-        let title = itemName;
-        if (item.Type == 'Movie' && item.ProductionYear) {
+        if (!layoutManager.mobile && title && item.Type == 'Movie' && item.ProductionYear) {
             title += ` (${datetime.toLocaleString(item.ProductionYear, { useGrouping: false })})`;
-        } else if (item.PremiereDate) {
+        } else if (!layoutManager.mobile && title && item.PremiereDate) {
             try {
                 const year = datetime.toLocaleString(datetime.parseISO8601Date(item.PremiereDate).getFullYear(), { useGrouping: false });
                 title += ` (${year})`;
@@ -258,7 +251,13 @@ export default function (view) {
             }
         }
 
+        // Main title: TV Shows (2000)
         LibraryMenu.setTitle(title);
+
+        // Osd title: S01E01 - Episode Name
+        if (itemName && parentName) {
+            view.querySelector('.osdTitle').innerHTML = itemName;
+        }
 
         const documentTitle = parentName || (item ? item.Name : null);
 
