@@ -68,9 +68,9 @@ function fillItem(item) {
     const elem = instance.options.parent;
 
     elem.querySelector('.upNextDialog-mediainfo').innerHTML = mediaInfo.getPrimaryMediaInfoHtml(item, {
-        criticRating: true,
+        criticRating: false,
         originalAirDate: false,
-        starRating: true,
+        starRating: false,
         subtitles: false
     });
 
