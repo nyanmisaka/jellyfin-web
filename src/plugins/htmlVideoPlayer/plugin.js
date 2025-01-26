@@ -1279,7 +1279,7 @@ export class HtmlVideoPlayer {
             api_key: apiClient.accessToken()
         });
         const htmlVideoPlayer = this;
-        import('@jellyfin/libass-wasm').then(({ default: SubtitlesOctopus }) => {
+        import('libass-wasm').then(({ default: SubtitlesOctopus }) => {
             const mediaSource = this._currentPlayOptions.mediaSource;
             const videoStream = getMediaStreamVideoTracks(mediaSource)[0];
 
