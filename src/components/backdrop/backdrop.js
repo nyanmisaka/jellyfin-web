@@ -18,7 +18,7 @@ function enableRotation() {
 }
 
 class Backdrop {
-    load(url, parent, existingBackdropImage) {
+    load(url, parent) {
         const img = new Image();
         const self = this;
 
@@ -37,9 +37,6 @@ class Backdrop {
             parent.appendChild(backdropImage);
 
             if (!enableAnimation()) {
-                if (existingBackdropImage?.parentNode) {
-                    existingBackdropImage.parentNode.removeChild(existingBackdropImage);
-                }
                 internalBackdrop(true);
                 return;
             }
@@ -50,9 +47,6 @@ class Backdrop {
                 });
                 if (backdropImage === self.currentAnimatingElement) {
                     self.currentAnimatingElement = null;
-                }
-                if (existingBackdropImage?.parentNode) {
-                    existingBackdropImage.parentNode.removeChild(existingBackdropImage);
                 }
             };
 
@@ -150,16 +144,13 @@ function setBackdropImage(url) {
 
     const elem = getBackdropContainer();
     const existingBackdropImage = elem.querySelector('.displayingBackdropImage');
-
+    // If the current backdrop image is the same as the new one, do nothing
     if (existingBackdropImage && existingBackdropImage.getAttribute('data-url') === url) {
-        if (existingBackdropImage.getAttribute('data-url') === url) {
-            return;
-        }
-        existingBackdropImage.classList.remove('displayingBackdropImage');
+        return;
     }
 
     const instance = new Backdrop();
-    instance.load(url, elem, existingBackdropImage);
+    instance.load(url, elem);
     currentLoadingBackdrop = instance;
 }
 
@@ -253,7 +244,16 @@ function onRotationInterval() {
     }
 
     currentRotationIndex = newIndex;
-    setBackdropImage(currentRotatingImages[newIndex]);
+    const currentImage = currentRotatingImages[newIndex];
+    setBackdropImage(currentImage);
+
+    // Remove old images after a delay to allow fade-in animation (800ms) to complete
+    setTimeout(() => {
+        const oldImages = getBackdropContainer().querySelectorAll(`.backdropImage:not([data-url="${currentImage}"])`);
+        oldImages.forEach(img => {
+            img.parentNode?.removeChild(img);
+        });
+    }, 1600);
 }
 
 function clearRotation() {
