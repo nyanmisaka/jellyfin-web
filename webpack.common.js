@@ -12,10 +12,10 @@ const Assets = [
     'native-promise-only/npo.js',
     'libarchive.js/dist/worker-bundle.js',
     'libarchive.js/dist/libarchive.wasm',
-    '@jellyfin/libass-wasm/dist/js/default.woff2',
-    '@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.js',
-    '@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.wasm',
-    '@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker-legacy.js',
+    'libass-wasm/dist/js/default.ttc',
+    'libass-wasm/dist/js/subtitles-octopus-worker.js',
+    'libass-wasm/dist/js/subtitles-octopus-worker.wasm',
+    'libass-wasm/dist/js/subtitles-octopus-worker-legacy.js',
     'pdfjs-dist/build/pdf.worker.js'
 ];
 
@@ -193,7 +193,6 @@ const config = {
             {
                 test: /\.(js|jsx|mjs)$/,
                 include: [
-                    path.resolve(__dirname, 'node_modules/@jellyfin/libass-wasm'),
                     path.resolve(__dirname, 'node_modules/@jellyfin/sdk'),
                     path.resolve(__dirname, 'node_modules/@mui/base'),
                     path.resolve(__dirname, 'node_modules/@mui/lab'),
@@ -226,6 +225,7 @@ const config = {
                     path.resolve(__dirname, 'node_modules/highlight-words'),
                     path.resolve(__dirname, 'node_modules/idb-keyval'),
                     path.resolve(__dirname, 'node_modules/libarchive.js'),
+                    path.resolve(__dirname, 'node_modules/libass-wasm'),
                     path.resolve(__dirname, 'node_modules/libbitsub'),
                     path.resolve(__dirname, 'node_modules/linkify-it'),
                     path.resolve(__dirname, 'node_modules/markdown-it'),
@@ -358,7 +358,7 @@ const config = {
                 type: 'asset/resource'
             },
             {
-                test: /\.(woff|woff2|eot|ttf|otf)$/,
+                test: /\.(woff|woff2|eot|ttc|ttf|otf)$/,
                 type: 'asset/resource'
             },
             {
