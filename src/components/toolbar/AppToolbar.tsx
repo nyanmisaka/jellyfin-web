@@ -47,10 +47,8 @@ const AppToolbar: FC<PropsWithChildren<AppToolbarProps>> = ({
             variant='dense'
             className={className}
             sx={{
-                flexWrap: {
-                    xs: 'wrap',
-                    lg: 'nowrap'
-                }
+                flexWrap: 'nowrap',
+                minWidth: 0
             }}
         >
             {isUserLoggedIn && isDrawerAvailable && (
@@ -79,9 +77,24 @@ const AppToolbar: FC<PropsWithChildren<AppToolbarProps>> = ({
                 </Tooltip>
             )}
 
-            {children}
+            <Box
+                sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                }}
+            >
+                {children}
+            </Box>
 
-            <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexGrow: children ? 0 : 1,
+                    flexShrink: 0,
+                    justifyContent: 'flex-end'
+                }}
+            >
                 {buttons}
             </Box>
 
