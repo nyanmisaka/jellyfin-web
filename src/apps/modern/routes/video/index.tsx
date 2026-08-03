@@ -64,15 +64,34 @@ const VideoPage: FC = () => {
                         isDrawerOpen={false}
                         isBackButtonAvailable
                         isUserMenuAvailable={false}
-                        buttons={
-                            <>
+                        buttons={(
+                            <Box
+                                sx={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    flexShrink: 0,
+                                    whiteSpace: 'nowrap',
+                                    gap: 0.5
+                                }}
+                            >
                                 <SyncPlayButton />
                                 <RemotePlayButton />
-                            </>
-                        }
+                            </Box>
+                        )}
                         className='videoOsd-appBar'
                     >
-                        <Typography>{videoTitle}</Typography>
+                        <Typography
+                            sx={{
+                                minWidth: 0,
+                                flex: 1,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}
+                            title={videoTitle}
+                        >
+                            {videoTitle}
+                        </Typography>
                     </AppToolbar>
                 </Box>
             </Fade>
